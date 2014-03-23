@@ -67,11 +67,6 @@ is_package_defined() {
 		return 1
 	fi	
 }
-
-echo $PCC_PACKAGE_NAME;
-echo $PHD_PACKAGE_NAME;
-echo $PADS_PACKAGE_NAME;
-echo $PRTS_PACKAGE_NAME;
  
 echo "********************************************************************************"
 echo "*               Prepare PCC (Pivotal Control Center)  Perquisites               "
@@ -83,7 +78,7 @@ yum -y install httpd mod_ssl postgresql postgresql-devel postgresql-server compa
 # If missing try to download the Oracle JDK7 installation binary. 
 if [ ! -f /vagrant/jdk-7u45-linux-x64.rpm ];
 then   
-   cd /vagrant; wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F" "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.rpm"; cd ~
+   cd /vagrant; wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.rpm"; cd ~
 fi
  
 # Ensure that all installation packages are available in the same folder where  the 'vagrant up' is executed.
