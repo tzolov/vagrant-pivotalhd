@@ -10,6 +10,18 @@
 # 
 # Note: 'root' is the default user. You can not change the root user in the script. "$sudo su - gpadmin" will not work!
 #       Use the inline syntax instead: "$su - -c "some command" gpadmin".
+
+# Pivotal Control Center (PCC) package name ({PCC_PACKAGE_NAME}.x86_64.tar.gz)
+PCC_PACKAGE_NAME=$1
+
+# Pivotal HD (PHD) package name ({PHD_PACKAGE_NAME}.tar.gz)
+PHD_PACKAGE_NAME=$2
+
+# HAWQ - Pivotal Advanced Data Service (PADS) package name ({PADS_PACKAGE_NAME}.tar.gz)
+PADS_PACKAGE_NAME=$3
+
+# GemfireXD - Pivotal Real-Time Service (PRTS) package name ({PRTS_PACKAGE_NAME}.tar.gz)
+PRTS_PACKAGE_NAME=$4
  
 # Sets the cluster name to be used in PCC (Pivotal Control Center)
 CLUSTER_NAME=PHD_C1
@@ -37,7 +49,10 @@ HAWQ_SEGMENT_HOSTS=$MASTER_AND_SLAVES
 # Client node defaults to the MASTER node 
 CLIENT_NODE=$MASTER_NODE
 
+# By default the GemfireXD Locator is collocated with the other master services.
 GFXD_LOCATOR=$MASTER_NODE
+
+# GemfireXD servers
 GFXD_SERVERS=phd2.localdomain,phd3.localdomain
  
 # Root password required for creating gpadmin users on the cluster nodes. 
@@ -47,18 +62,7 @@ ROOT_PASSWORD=vagrant
 # Non-empty password to be used for the gpadmin user. Required by the PHD installation. 
 GPADMIN_PASSWORD=gpadmin
 
-# Pivotal Control Center (PCC) package name ({PCC_PACKAGE_NAME}.x86_64.tar.gz)
-PCC_PACKAGE_NAME=$1
-
-# Pivotal HD (PHD) package name ({PHD_PACKAGE_NAME}.tar.gz)
-PHD_PACKAGE_NAME=$2
-
-# HAWQ - Pivotal Advanced Data Service (PADS) package name ({PADS_PACKAGE_NAME}.tar.gz)
-PADS_PACKAGE_NAME=$3
-
-# GemfireXD - Pivotal Real-Time Service (PRTS) package name ({PRTS_PACKAGE_NAME}.tar.gz)
-PRTS_PACKAGE_NAME=$4
- 
+# Empty or 'NA' stands for undefined package
 is_package_defined() {
 	local package_name="$1"
 	if [ ! -z "$package_name" -a "$package_name" != "NA" ]; then
@@ -76,8 +80,7 @@ echo "**************************************************************************
 yum -y install httpd mod_ssl postgresql postgresql-devel postgresql-server compat-readline5 createrepo sigar nc expect sudo wget
  
 # If missing try to download the Oracle JDK7 installation binary. 
-if [ ! -f /vagrant/jdk-7u45-linux-x64.rpm ];
-then   
+if [ ! -f /vagrant/jdk-7u45-linux-x64.rpm ]; then   
    cd /vagrant; wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/7u45-b18/jdk-7u45-linux-x64.rpm"; cd ~
 fi
  
@@ -89,6 +92,7 @@ fi
 if (is_package_defined $PADS_PACKAGE_NAME); then
    [ ! -f /vagrant/$PADS_PACKAGE_NAME.tar.gz ] && ( echo "Can not find $PADS_PACKAGE_NAME.tar.gz in the vagrant startup directory"; exit 1 )
 fi
+
 if (is_package_defined $PRTS_PACKAGE_NAME); then
    [ ! -f /vagrant/$PRTS_PACKAGE_NAME.tar.gz ] && ( echo "Can not find $PRTS_PACKAGE_NAME.tar.gz in the vagrant startup directory"; exit 1 )
 fi
