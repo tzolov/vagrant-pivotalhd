@@ -57,15 +57,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     phd_vm_name = "phd#{i}"
 
     config.vm.define phd_vm_name.to_sym do |phd_conf|
-	  phd_conf.vm.box = VM_BOX
-	  phd_conf.vm.provider :virtualbox do |v|
+      phd_conf.vm.box = VM_BOX
+      phd_conf.vm.provider :virtualbox do |v|
         v.name = phd_vm_name
-		v.customize ["modifyvm", :id, "--memory", PHD_MEMORY_MB]
+        v.customize ["modifyvm", :id, "--memory", PHD_MEMORY_MB]
       end
-	  phd_conf.vm.provider "vmware_fusion" do |v|
-		v.name = phd_vm_name
-		v.vmx["memsize"]  = PHD_MEMORY_MB
-	  end     	  
+      phd_conf.vm.provider "vmware_fusion" do |v|
+        v.name = phd_vm_name
+        v.vmx["memsize"]  = PHD_MEMORY_MB
+      end     	  
 
       phd_conf.vm.host_name = "phd#{i}.localdomain"    
       phd_conf.vm.network :private_network, ip: "10.211.55.#{i+100}"	  
@@ -75,8 +75,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         s.args = NUMBER_OF_CLUSTER_NODES
       end 
 	  
-	  #Fix hostname FQDN
-	  phd_conf.vm.provision :shell, :inline => "hostname phd#{i}.localdomain"
+      #Fix hostname FQDN
+      phd_conf.vm.provision :shell, :inline => "hostname phd#{i}.localdomain"
     end
   end
 
@@ -88,13 +88,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    pcc.vm.box = VM_BOX
 
    pcc.vm.provider :virtualbox do |v|
-    v.name = PCC_VM_NAME
-    v.customize ["modifyvm", :id, "--memory", PCC_MEMORY_MB]
+     v.name = PCC_VM_NAME
+     v.customize ["modifyvm", :id, "--memory", PCC_MEMORY_MB]
    end
 
    pcc.vm.provider "vmware_fusion" do |v|
-    v.name = PCC_VM_NAME
-    v.vmx["memsize"]  = PCC_MEMORY_MB
+     v.name = PCC_VM_NAME
+     v.vmx["memsize"]  = PCC_MEMORY_MB
    end  
 
    pcc.vm.hostname = "pcc.localdomain"
@@ -103,14 +103,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    # Initialization common for all nodes
    pcc.vm.provision "shell" do |s|
-    s.path = "prepare_all_nodes.sh"
-    s.args = NUMBER_OF_CLUSTER_NODES
+     s.path = "prepare_all_nodes.sh"
+     s.args = NUMBER_OF_CLUSTER_NODES
    end
    
    # Install PCC 
    pcc.vm.provision "shell" do |s|
-    s.path = "pcc_install.sh"
-    s.args = PHD_DISTRIBUTION_TO_INSTALL
+     s.path = "pcc_install.sh"
+     s.args = PHD_DISTRIBUTION_TO_INSTALL
    end 
    
    # Fix a known ICM bug (fix has to e applied before installing the cluster!)
@@ -119,10 +119,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    # Deploy the PHD cluster
    if (DEPLOY_PHD_CLUSTER)
-      pcc.vm.provision "shell" do |s|
+     pcc.vm.provision "shell" do |s|
        s.path = "phd_cluster_deploy.sh"
        s.args = [CLUSTER_NAME, SERVICES, MASTER, WORKERS]
-      end 
+     end 
    end
    
    # Fix hostname FQDN
