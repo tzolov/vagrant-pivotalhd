@@ -9,6 +9,9 @@
 # 
 # Note: 'root' is the default user. You can not change the root user in the script. "$sudo su - gpadmin" will not work!
 #       Use the inline syntax instead: "$su - -c "some command" gpadmin".
+
+
+[ "$#" -ne 5 ] && (echo "Expects 5 input agreements but found: $#"; exit 1)
  
 # Sets the cluster name to be used in PCC (Pivotal Control Center)
 CLUSTER_NAME=$1
@@ -24,7 +27,11 @@ SERVICES=$2
 # Note: Master node is not an Admin node (where PCC runs). By convention the Admin node is the pcc.localdomain. 
 MASTER_NODE=$3
 
+# List of worker nodes
 SLAVE_NODES=$4
+
+# Amount of memory allocated for this node (VM)
+PHD_MEMORY_MB=$5
  
 # By default the HAWQ master is collocated with the other master services.
 HAWQ_MASTER=$MASTER_NODE
@@ -101,8 +108,24 @@ s/<yarn-resourcemanager>.*<\/yarn-resourcemanager>/<yarn-resourcemanager>$MASTER
 s/<yarn-nodemanager>.*<\/yarn-nodemanager>/<yarn-nodemanager>$MASTER_AND_SLAVES<\/yarn-nodemanager>/g;\
 s/<mapreduce-historyserver>.*<\/mapreduce-historyserver>/<mapreduce-historyserver>$MASTER_NODE<\/mapreduce-historyserver>/g;\
 s/<zookeeper-server>.*<\/zookeeper-server>/<zookeeper-server>$MASTER_NODE<\/zookeeper-server>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
-
 #s/<zookeeper-server>.*<\/zookeeper-server>/<zookeeper-server>$MASTER_AND_SLAVES<\/zookeeper-server>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
+
+# Configure the YARN and Heap memory relative to the available VM memory size
+nm_resource_memory_mb=$(((PHD_MEMORY_MB / 100) * 90))
+nm_resource_memory_mb_85_percent=$(((PHD_MEMORY_MB / 100) * 85))
+yarn_scheduler_minimum_allocation_mb=$(($nm_resource_memory_mb_85_percent<1024?$nm_resource_memory_mb_85_percent:1024))
+heap_memory_mb=$(($nm_resource_memory_mb_85_percent<2048?$nm_resource_memory_mb_85_percent:2048))
+
+sed -i "\
+s/<yarn.nodemanager.resource.memory-mb>.*<\/yarn.nodemanager.resource.memory-mb>/<yarn.nodemanager.resource.memory-mb>$nm_resource_memory_mb<\/yarn.nodemanager.resource.memory-mb>/g;\
+s/<yarn.scheduler.minimum-allocation-mb>.*<\/yarn.scheduler.minimum-allocation-mb>/<yarn.scheduler.minimum-allocation-mb>$yarn_scheduler_minimum_allocation_mb<\/yarn.scheduler.minimum-allocation-mb>/g;\
+s/<dfs.namenode.heapsize.mb>.*<\/dfs.namenode.heapsize.mb>/<dfs.namenode.heapsize.mb>$heap_memory_mb<\/dfs.namenode.heapsize.mb>/g;\
+s/<dfs.datanode.heapsize.mb>.*<\/dfs.datanode.heapsize.mb>/<dfs.datanode.heapsize.mb>$heap_memory_mb<\/dfs.datanode.heapsize.mb>/g;\
+s/<yarn.resourcemanager.heapsize.mb>.*<\/yarn.resourcemanager.heapsize.mb>/<yarn.resourcemanager.heapsize.mb>$heap_memory_mb<\/yarn.resourcemanager.heapsize.mb>/g;\
+s/<yarn.nodemanager.heapsize.mb>.*<\/yarn.nodemanager.heapsize.mb>/<yyarn.nodemanager.heapsize.mb>$heap_memory_mb<\/yarn.nodemanager.heapsize.mb>/g;\
+s/<hbase.heapsize.mb>.*<\/hbase.heapsize.mb>/<hbase.heapsize.mb>$heap_memory_mb<\/hbase.heapsize.mb>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
+
+
 
 if (is_service_enabled "hbase"); then
 sed -i "\

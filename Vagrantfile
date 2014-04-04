@@ -34,7 +34,7 @@ PHD_111_HAWQ_GFXD = ["PCC-2.1.1-73", "PHD-1.1.1.0-82", "PADS-1.1.4-34", "PRTS-1.
 PHD_20_BETA_LATEST_HAWQ_GFXD = ["PCC-2.2.0-175", "PHD-2.0.0.0-144", "PADS-1.2.0.0-7425", "PRTS-1.0.0-14"]	
 
 # Set the distribution to install
-PHD_DISTRIBUTION_TO_INSTALL = PHD_110_HAWQ_GFXD
+PHD_DISTRIBUTION_TO_INSTALL = PHD_20_BETA_LATEST_HAWQ_GFXD
 
 # Vagrant box name
 VM_BOX = "CentOS-6.4-x86_64"
@@ -121,7 +121,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    if (DEPLOY_PHD_CLUSTER)
      pcc.vm.provision "shell" do |s|
        s.path = "phd_cluster_deploy.sh"
-       s.args = [CLUSTER_NAME, SERVICES, MASTER, WORKERS]
+       s.args = [CLUSTER_NAME, SERVICES, MASTER, WORKERS, PHD_MEMORY_MB]
      end 
    end
    
