@@ -5,6 +5,7 @@
 *.log
 *.log.*
 *.sig
+*.rpm
 pkg/
 src/
 
