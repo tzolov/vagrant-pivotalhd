@@ -8,4 +8,5 @@
 *.rpm
 pkg/
 src/
+.vagrant/
 
