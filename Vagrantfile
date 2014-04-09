@@ -17,7 +17,7 @@ MASTER = ["phd1.localdomain"]
 
 # Node(s) to be used as a Workers. Convention is: 'phd<Number>.localdomain'. At least one worker node is required
 # The master node can be reused as a worker. 
-WORKERS = ["phd1.localdomain", "phd2.localdomain", "phd3.localdomain", "phd4.localdomain"]
+WORKERS = ["phd1.localdomain", "phd2.localdomain"]
 
 # Some commonly used PHD distributions are predefined below. Select one and assign it to PHD_DISTRIBUTION_TO_INSTALL 
 # To install different packages versions put those packages in the Vagrantfile folder and define 
@@ -57,7 +57,8 @@ DEPLOY_PHD_CLUSTER = TRUE
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Compute the total number of nodes in the cluster 	
-  NUMBER_OF_CLUSTER_NODES = MASTER.size + (MASTER.to_set ^ WORKERS.to_set).size
+  #NUMBER_OF_CLUSTER_NODES = MASTER.size + (MASTER.to_set ^ WORKERS.to_set).size
+  NUMBER_OF_CLUSTER_NODES = (MASTER + WORKERS).uniq.size
   
   # Create VM for every PHD node
   (1..NUMBER_OF_CLUSTER_NODES).each do |i|
