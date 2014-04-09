@@ -1,7 +1,10 @@
 #!/bin/bash
  
+# Remove any pre-installed Ruby or Puppet packages to avoid 
+# conflicts with Ruby/Puppet packages installed by PCC.
+yum -y remove puppet ruby facter ruby-augeas ruby-libs libselinux-ruby
+ 
 # Install the packages required for all cluster and admin nodes 
-
 yum -y install postgresql-devel nc expect ed ntp dmidecode pciutils
 
 # Set timezone and run NTP (set to Europe - Amsterdam time).

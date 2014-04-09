@@ -4,17 +4,20 @@
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
+require 'set'
+
 # PivotalHD cluster name
 CLUSTER_NAME = "phd-c1"
 
 # List of services to deploy. Note: hdfs,yarn and zookeeper services are compulsory! 
-SERVICES = "hdfs,yarn,hive,pig,zookeeper,hbase,gfxd,gpxf,hawq"
+SERVICES = ["hdfs", "yarn", "hive", "pig", "zookeeper", "hbase", "gpxf", "hawq", "gfxd", "graphlab"]
 
-# Node(s) to be used as a master. Convention is: 'phdXX.localdomain'. Exactly one master node has to be provided
-MASTER = "phd1.localdomain"
+# Node(s) to be used as a master. Convention is: 'phd<Number>.localdomain'. Exactly One master node must be provided
+MASTER = ["phd1.localdomain"]
 
-# Node(s) to be used as a Workers. Convention is: 'phdXX.localdomain'. At least one worker node is required
-WORKERS = "phd2.localdomain,phd3.localdomain"
+# Node(s) to be used as a Workers. Convention is: 'phd<Number>.localdomain'. At least one worker node is required
+# The master node can be reused as a worker. 
+WORKERS = ["phd1.localdomain", "phd2.localdomain", "phd3.localdomain", "phd4.localdomain"]
 
 # Some commonly used PHD distributions are predefined below. Select one and assign it to PHD_DISTRIBUTION_TO_INSTALL 
 # To install different packages versions put those packages in the Vagrantfile folder and define 
@@ -31,15 +34,20 @@ PHD_110_HAWQ_GFXD = ["PCC-2.1.0-460", "PHD-1.1.0.0-76", "PADS-1.1.3-31", "PRTS-1
 # PivotalHD 1.1.1 distribution
 PHD_111_HAWQ_GFXD = ["PCC-2.1.1-73", "PHD-1.1.1.0-82", "PADS-1.1.4-34", "PRTS-1.0.0-9"]
 # PivotalHD 2.0 beta distribution
-PHD_20_BETA_LATEST_HAWQ_GFXD = ["PCC-2.2.0-175", "PHD-2.0.0.0-144", "PADS-1.2.0.0-7425", "PRTS-1.0.0-14"]	
+PHD_20_LATEST_HAWQ_GFXD = ["PCC-2.2.0-175", "PHD-2.0.0.0-144", "PADS-1.2.0.0-7425", "PRTS-1.0.0-14"]	
 
 # Set the distribution to install
-PHD_DISTRIBUTION_TO_INSTALL = PHD_20_BETA_LATEST_HAWQ_GFXD
+PHD_DISTRIBUTION_TO_INSTALL = PHD_20_LATEST_HAWQ_GFXD
+
+# JDK to be installed
+JAVA_RPM_PATH = "/vagrant/jdk-7u45-linux-x64.rpm"
 
 # Vagrant box name
 VM_BOX = "CentOS-6.4-x86_64"
+
 # Memory (MB) allocated for every PHD node VM
 PHD_MEMORY_MB = "1536"
+
 # Memory (MB) allocated for the PCC VM
 PCC_MEMORY_MB = "768"
 
@@ -49,8 +57,8 @@ DEPLOY_PHD_CLUSTER = TRUE
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Compute the total number of nodes in the cluster 	
-  NUMBER_OF_CLUSTER_NODES = MASTER.split(",").length + WORKERS.split(",").length 
-
+  NUMBER_OF_CLUSTER_NODES = MASTER.size + (MASTER.to_set ^ WORKERS.to_set).size
+  
   # Create VM for every PHD node
   (1..NUMBER_OF_CLUSTER_NODES).each do |i|
 
@@ -110,18 +118,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    # Install PCC 
    pcc.vm.provision "shell" do |s|
      s.path = "pcc_install.sh"
-     s.args = PHD_DISTRIBUTION_TO_INSTALL
+     s.args = [JAVA_RPM_PATH] + PHD_DISTRIBUTION_TO_INSTALL
    end 
-   
-   # Fix a known ICM bug (fix has to e applied before installing the cluster!)
-   pcc.vm.provision :shell, :inline => "sed -i $'s/\"INSTALL_UNKNOWN\" + \"\x01\"/\"INSTALL_UNKNOWN\" + \"\x01\" + \"\" + \"\x03\"/g' /usr/lib/gphd/gphdmgr/lib/server/StatusFetcher.py"
-   pcc.vm.provision :shell, :inline => "sed -i 's/gphdmgr.statusfetch.interval.secs=10/gphdmgr.statusfetch.interval.secs=30/g' /etc/gphd/gphdmgr/conf/gphdmgr.properties"
 
    # Deploy the PHD cluster
    if (DEPLOY_PHD_CLUSTER)
      pcc.vm.provision "shell" do |s|
        s.path = "phd_cluster_deploy.sh"
-       s.args = [CLUSTER_NAME, SERVICES, MASTER, WORKERS, PHD_MEMORY_MB]
+       s.args = [CLUSTER_NAME, SERVICES.uniq.join(","), MASTER.uniq.join(","), WORKERS.uniq.join(","), PHD_MEMORY_MB, JAVA_RPM_PATH]
      end 
    end
    

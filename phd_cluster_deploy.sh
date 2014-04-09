@@ -11,8 +11,8 @@
 #       Use the inline syntax instead: "$su - -c "some command" gpadmin".
 
 
-[ "$#" -ne 5 ] && (echo "Expects 5 input agreements but found: $#"; exit 1)
- 
+[ "$#" -ne 6 ] && (echo "Expects 5 input agreements but found: $#"; exit 1)
+  
 # Sets the cluster name to be used in PCC (Pivotal Control Center)
 CLUSTER_NAME=$1
  
@@ -20,7 +20,7 @@ CLUSTER_NAME=$1
 # Note: Hive is disabled because phd2 and ph3 VMs are configured with just 1GB of memory (Vagrantfile)! To enable Hive 
 # increase the memory of the VMs to 2GB at least (edit Vagrantfile) and then add 'hive' to the $SERVICES variable.
 # Alternativly if you don't have enough physical memory then you can remove one VM (phd3 for example) and increase the memory
-# of the remaining VMs. For this you need to remove phd3 definition from the Vagrangfile and from the $MASTER_AND_SLAVES list.
+# of the remaining VMs. For this you need to remove phd3 definition from the Vagrangfile and from the $SLAVE_NODES list.
 SERVICES=$2
  
 # Sets the dns name of the VM used as Master node for all Hadoop services (e.g. namenode, hawq master, jobtracker ...)
@@ -28,19 +28,18 @@ SERVICES=$2
 MASTER_NODE=$3
 
 # List of worker nodes
-SLAVE_NODES=$4
+WORKER_NODES=$4
 
 # Amount of memory allocated for this node (VM)
 PHD_MEMORY_MB=$5
  
+JAVA_RPM_PATH=$6 
+ 
 # By default the HAWQ master is collocated with the other master services.
 HAWQ_MASTER=$MASTER_NODE
- 
-# List of all Pivotal HD nodes in the cluster (including the master node)
-MASTER_AND_SLAVES=$MASTER_NODE,$SLAVE_NODES
- 
+  
 # By default all nodes will be used as Hawq segment hosts. Edit the $HAWQ_SEGMENT_HOSTS variable to change this setup.  
-HAWQ_SEGMENT_HOSTS=$MASTER_AND_SLAVES
+HAWQ_SEGMENT_HOSTS=$WORKER_NODES
  
 # Client node defaults to the MASTER node 
 CLIENT_NODE=$MASTER_NODE
@@ -48,8 +47,8 @@ CLIENT_NODE=$MASTER_NODE
 # By default the GemfireXD Locator is collocated with the other master services.
 GFXD_LOCATOR=$MASTER_NODE
 
-# GemfireXD servers
-GFXD_SERVERS=$SLAVE_NODES
+# GemfireXD servers. Remove the master node if present
+GFXD_SERVERS=${WORKER_NODES/$MASTER_NODE,/}
  
 # Root password required for creating gpadmin users on the cluster nodes. 
 # (By default Vagrant creates 'vagrant' root user on every VM. The password is 'vagrant' - used below)
@@ -85,7 +84,7 @@ su - -c "icm_client fetch-template -o ~/ClusterConfigDir" gpadmin
  
 # Use the following convention to assign cluster hosts to Hadoop service roles. All changes are 
 # applied to the ~/ClusterConfigDir/clusterConfig.xml file, generated in the previous step. 
-# Note: By default HAWQ_MASTER=MASTER_NODE, CLIENT_NODE=MASTER_NODE and HAWQ_SEGMENT_HOSTS=MASTER_AND_SLAVES
+# Note: By default HAWQ_MASTER=MASTER_NODE, CLIENT_NODE=MASTER_NODE and HAWQ_SEGMENT_HOSTS=WORKER_NODES
 # ---------------------------------------------------------------------------------------------------------
 #      Hosts        |                       Services
 # ---------------------------------------------------------------------------------------------------------
@@ -93,22 +92,26 @@ su - -c "icm_client fetch-template -o ~/ClusterConfigDir" gpadmin
 #                   | hbase-master,hive-server,hive-metastore,hawq-master,hawq-standbymaste,hawq-segment,
 #                   | gpxf-agent
 #                   |
-# MASTER_AND_SLAVES | datanode,yarn-nodemanager,zookeeper-server,hbase-regionserver,hawq-segment,gpxf-agent 
+# WORKER_NODES       | datanode,yarn-nodemanager,zookeeper-server,hbase-regionserver,hawq-segment,gpxf-agent 
 # ---------------------------------------------------------------------------------------------------------
 
 # Apply the mapping convention (above) to the default clusterConfig.xml.
+
+# remove services not supported by the clusterConfig.xml
+SUPPORTED_SERVICES=${SERVICES/,graphlab/}
+
 sed -i "\
 s/<clusterName>.*<\/clusterName>/<clusterName>$CLUSTER_NAME<\/clusterName>/g;\
-s/<services>.*<\/services>/<services>$SERVICES<\/services>/g;\
+s/<services>.*<\/services>/<services>$SUPPORTED_SERVICES<\/services>/g;\
 s/<client>.*<\/client>/<client>$CLIENT_NODE<\/client>/g;\
 s/<namenode>.*<\/namenode>/<namenode>$MASTER_NODE<\/namenode>/g;\
-s/<datanode>.*<\/datanode>/<datanode>$MASTER_AND_SLAVES<\/datanode>/g;\
+s/<datanode>.*<\/datanode>/<datanode>$WORKER_NODES<\/datanode>/g;\
 s/<secondarynamenode>.*<\/secondarynamenode>/<secondarynamenode>$MASTER_NODE<\/secondarynamenode>/g;\
 s/<yarn-resourcemanager>.*<\/yarn-resourcemanager>/<yarn-resourcemanager>$MASTER_NODE<\/yarn-resourcemanager>/g;\
-s/<yarn-nodemanager>.*<\/yarn-nodemanager>/<yarn-nodemanager>$MASTER_AND_SLAVES<\/yarn-nodemanager>/g;\
+s/<yarn-nodemanager>.*<\/yarn-nodemanager>/<yarn-nodemanager>$WORKER_NODES<\/yarn-nodemanager>/g;\
 s/<mapreduce-historyserver>.*<\/mapreduce-historyserver>/<mapreduce-historyserver>$MASTER_NODE<\/mapreduce-historyserver>/g;\
 s/<zookeeper-server>.*<\/zookeeper-server>/<zookeeper-server>$MASTER_NODE<\/zookeeper-server>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
-#s/<zookeeper-server>.*<\/zookeeper-server>/<zookeeper-server>$MASTER_AND_SLAVES<\/zookeeper-server>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
+#s/<zookeeper-server>.*<\/zookeeper-server>/<zookeeper-server>$WORKER_NODES<\/zookeeper-server>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
 
 # Configure the YARN and Heap memory relative to the available VM memory size
 nm_resource_memory_mb=$(((PHD_MEMORY_MB / 100) * 90))
@@ -128,7 +131,7 @@ s/<hbase.heapsize.mb>.*<\/hbase.heapsize.mb>/<hbase.heapsize.mb>$heap_memory_mb<
 if (is_service_enabled "hbase"); then
 sed -i "\
 s/<hbase-master>.*<\/hbase-master>/<hbase-master>$MASTER_NODE<\/hbase-master>/g;\
-s/<hbase-regionserver>.*<\/hbase-regionserver>/<hbase-regionserver>$MASTER_AND_SLAVES<\/hbase-regionserver>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
+s/<hbase-regionserver>.*<\/hbase-regionserver>/<hbase-regionserver>$WORKER_NODES<\/hbase-regionserver>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
 fi
 
 if (is_service_enabled "hive"); then
@@ -137,16 +140,13 @@ s/<hive-server>.*<\/hive-server>/<hive-server>$MASTER_NODE<\/hive-server>/g;\
 s/<hive-metastore>.*<\/hive-metastore>/<hive-metastore>$MASTER_NODE<\/hive-metastore>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
 fi
 
-# <<HAWQ>>
 if (is_service_enabled "hawq"); then
 sed -i "\
 s/<hawq-master>.*<\/hawq-master>/<hawq-master>$HAWQ_MASTER<\/hawq-master>/g;\
 s/<hawq-standbymaster>.*<\/hawq-standbymaster>/<hawq-standbymaster>$HAWQ_MASTER<\/hawq-standbymaster>/g;\
 s/<hawq-segment>.*<\/hawq-segment>/<hawq-segment>$HAWQ_SEGMENT_HOSTS<\/hawq-segment>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
 fi
-# <<HAWQ>>
 
-# <<GFXD>>
 if (is_service_enabled "gfxd"); then
 sed -i "\
 s/<\/hostRoleMapping>/\
@@ -156,7 +156,8 @@ s/<\/hostRoleMapping>/\
 \n         <\/gfxd>\
 \n     <\/hostRoleMapping>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
 fi
-# <</GFXD>>
+ 
+xmlwf /home/gpadmin/ClusterConfigDir/clusterConfig.xml  
  
 # Set vm.overcommit_memory to 1 to prevent OOM and other VM issues. 
 sed -i 's/vm.overcommit_memory = 2/vm.overcommit_memory = 0/g' /usr/lib/gphd/gphdmgr/hawq_sys_config/sysctl.conf
@@ -168,7 +169,7 @@ cat > /home/gpadmin/deploy_cluster.exp <<EOF
  
 set timeout 100
  
-spawn icm_client deploy -c /home/gpadmin/ClusterConfigDir -s -i -d -j /vagrant/jdk-7u45-linux-x64.rpm -y /usr/lib/gphd/gphdmgr/hawq_sys_config/
+spawn icm_client deploy -c /home/gpadmin/ClusterConfigDir -s -i -d -j $JAVA_RPM_PATH -y /usr/lib/gphd/gphdmgr/hawq_sys_config/
  
 expect "Please enter the root password for the cluster nodes:"
 send -- "$ROOT_PASSWORD\r"
@@ -186,12 +187,12 @@ su - -c "expect -f /home/gpadmin/deploy_cluster.exp" gpadmin
 printf "\n"
 
 # Wait until deployment complete (e.g. not in install_progress)
-cstatus="unknown"; while [[ "$cstatus" != *"installed"* ]]; do cstatus=$(icm_client list | grep "$CLUSTER_NAME"| awk '{ print $11}');  echo "Cluster $CLUSTER_NAME status: $cstatus"; sleep 10; done
+cstatus="unknown"; while [[ "$cstatus" != *"installed"* && "$cstatus" != *"install_failed"* ]]; do cstatus=$(icm_client list | grep "$CLUSTER_NAME"| awk '{ print $11}');  echo "[$(date +'%H:%M:%S')] $CLUSTER_NAME Status: $cstatus "; sleep 20; done
 
-# Fix java 5 override. 
-ssh gpadmin@$HAWQ_MASTER 'ln -f -s /usr/java/default/bin/java /usr/bin/java';
+# Fix Hive's java5 override. 
+sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $HAWQ_MASTER 'sudo ln -f -s /usr/java/default/bin/java /usr/bin/java'
 
-# <<HAWQ>>  
+
 if (is_service_enabled "hawq"); then
 echo "********************************************************************************"
 echo "*                    HAWQ - post deploy configuration                   "
@@ -204,7 +205,6 @@ scp /home/gpadmin/HAWQ_Segment_Hosts.txt gpadmin@$HAWQ_MASTER:/home/gpadmin/HAWQ
 ssh gpadmin@$HAWQ_MASTER 'source /usr/local/hawq/greenplum_path.sh;\
 /usr/local/hawq/bin/gpssh-exkeys -f /home/gpadmin/HAWQ_Segment_Hosts.txt -p $GPADMIN_PASSWORD'" gpadmin
 fi
-# <</HAWQ>>
  
 echo "********************************************************************************"
 echo "*                 Start Cluster: $CLUSTER_NAME                                  "
@@ -214,7 +214,6 @@ su - -c "icm_client list" gpadmin
   
 su - -c "icm_client start -l $CLUSTER_NAME" gpadmin
 
-# <<HAWQ>>  
 if (is_service_enabled "hawq"); then
 echo "********************************************************************************"
 echo "*                       Initialise HAWQ   									  "
@@ -222,12 +221,10 @@ echo "**************************************************************************
 
 su - -c "ssh gpadmin@$HAWQ_MASTER '/etc/init.d/hawq init'" gpadmin;
 fi
-# <</HAWQ>>
 
-# <<GFXD>>
 if (is_service_enabled "gfxd"); then
 echo "********************************************************************************"
-echo "*                       Initialise GemFireXD   									  "
+echo "*                       Initialise GemFireXD   							      "
 echo "********************************************************************************"
 
 echo "Initialize GFXD locator: $GFXD_LOCATOR"
@@ -243,4 +240,16 @@ do
 nohup sqlf server start -locators=$GFXD_LOCATOR[10334] -bind-address=$gfxd_server -client-port=1528 -dir=/tmp/server &'" gpadmin
 done
 fi
-# <</GFXD>>
+
+if (is_service_enabled "graphlab"); then
+echo "********************************************************************************"
+echo "*                       Instal Hamster & GraphLab   						      "
+echo "********************************************************************************"
+
+CLIENT_AND_WORKER_NODES=$CLIENT_NODE,$WORKER_NODES
+for graphlab_server in ${CLIENT_AND_WORKER_NODES//,/ }
+do
+  echo "Install Hamster and GraphLab  on server: $graphlab_server"  
+  sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $graphlab_server 'sudo yum -y install hamster-core openmpi hamster-rte graphlab'
+done
+fi
