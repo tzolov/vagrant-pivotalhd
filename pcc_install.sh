@@ -76,7 +76,7 @@ service commander stop
 tar --no-same-owner -xzvf /vagrant/$PCC_PACKAGE_NAME.x86_64.tar.gz --directory /home/vagrant/; cd /home/vagrant/$PCC_PACKAGE_NAME
 
 # Pre-patch before icm is run
-sed -i "s/service commander start/sed -i \'s\/gphdmgr.statusfetch.interval.secs=10\/gphdmgr.statusfetch.interval.secs=30\/g\' \/etc\/gphd\/gphdmgr\/conf\/gphdmgr.properties; \n& service commander start/g " /home/vagrant/$PCC_PACKAGE_NAME/support/install_script 
+sudo sed -i "s/service commander start/sed -i \'s\/gphdmgr.statusfetch.interval.secs=10\/gphdmgr.statusfetch.interval.secs=30\/g\' \/etc\/gphd\/gphdmgr\/conf\/gphdmgr.properties; \n& service commander start/g " /home/vagrant/$PCC_PACKAGE_NAME/support/install_script 
  
 # Install PCC as root using root's login shell (Note: will not work without the '-' option)
 su - -c "cd /home/vagrant/$PCC_PACKAGE_NAME; ./install" root
