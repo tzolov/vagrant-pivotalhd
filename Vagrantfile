@@ -43,7 +43,9 @@ PHD_DISTRIBUTION_TO_INSTALL = PHD_20_LATEST_HAWQ_GFXD
 JAVA_RPM_PATH = "/vagrant/jdk-7u45-linux-x64.rpm"
 
 # Vagrant box name
-VM_BOX = "CentOS-6.4-x86_64"
+#   bigdata/centos6.4_x86_64 - 40G disk space.
+#   bigdata/centos6.4_x86_64_small - just 8G of disk space. Not enough for Hue!
+VM_BOX = "bigdata/centos6.4_x86_64"
 
 # Memory (MB) allocated for every PHD node VM
 PHD_MEMORY_MB = "1536"
