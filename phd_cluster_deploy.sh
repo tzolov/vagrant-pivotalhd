@@ -10,6 +10,7 @@
 # Note: 'root' is the default user. You can not change the root user in the script. "$sudo su - gpadmin" will not work!
 #       Use the inline syntax instead: "$su - -c "some command" gpadmin".
 
+source /vagrant/provision/oozie_service.sh
 
 [ "$#" -ne 6 ] && (echo "Expects 5 input agreements but found: $#"; exit 1)
   
@@ -98,7 +99,7 @@ su - -c "icm_client fetch-template -o ~/ClusterConfigDir" gpadmin
 # Apply the mapping convention (above) to the default clusterConfig.xml.
 
 # remove services not supported by the clusterConfig.xml
-SUPPORTED_SERVICES=${SERVICES/,graphlab/}
+SUPPORTED_SERVICES=$SERVICES; for non_icm_service in 'graphlab' 'oozie'; do SUPPORTED_SERVICES=${SUPPORTED_SERVICES/,$non_icm_service}; done
 
 sed -i "\
 s/<clusterName>.*<\/clusterName>/<clusterName>$CLUSTER_NAME<\/clusterName>/g;\
@@ -192,6 +193,13 @@ cstatus="unknown"; while [[ "$cstatus" != *"installed"* && "$cstatus" != *"insta
 # Fix Hive's java5 override. 
 sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $HAWQ_MASTER 'sudo ln -f -s /usr/java/default/bin/java /usr/bin/java'
 
+#######################################################################################
+#                           Oozie Deployment
+#######################################################################################
+if (is_service_enabled "oozie"); then
+    # Oozie client node, Oozie Server node, Name Node, Root password
+    oozie_deployment $CLIENT_NODE $MASTER_NODE $ROOT_PASSWORD
+fi
 
 if (is_service_enabled "hawq"); then
 echo "********************************************************************************"
@@ -213,6 +221,14 @@ echo "**************************************************************************
 su - -c "icm_client list" gpadmin
   
 su - -c "icm_client start -l $CLUSTER_NAME" gpadmin
+
+#######################################################################################
+#                       Oozie post initialization
+#######################################################################################
+if (is_service_enabled "oozie"); then
+    # Arguments: Oozie Server node, Name Node, Root password
+    oozie_post_initialization $MASTER_NODE $MASTER_NODE $ROOT_PASSWORD
+fi
 
 if (is_service_enabled "hawq"); then
 echo "********************************************************************************"
