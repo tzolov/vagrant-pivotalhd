@@ -11,6 +11,8 @@
 #       Use the inline syntax instead: "$su - -c "some command" gpadmin".
 
 source /vagrant/provision/oozie_service.sh
+source /vagrant/provision/hue_service.sh
+source /vagrant/provision/sqoop_service.sh
 
 [ "$#" -ne 6 ] && (echo "Expects 5 input agreements but found: $#"; exit 1)
   
@@ -99,7 +101,7 @@ su - -c "icm_client fetch-template -o ~/ClusterConfigDir" gpadmin
 # Apply the mapping convention (above) to the default clusterConfig.xml.
 
 # remove services not supported by the clusterConfig.xml
-SUPPORTED_SERVICES=$SERVICES; for non_icm_service in 'graphlab' 'oozie'; do SUPPORTED_SERVICES=${SUPPORTED_SERVICES/,$non_icm_service}; done
+SUPPORTED_SERVICES=$SERVICES; for non_icm_service in 'graphlab' 'oozie' 'hue' 'sqoop'; do SUPPORTED_SERVICES=${SUPPORTED_SERVICES/,$non_icm_service}; done
 
 sed -i "\
 s/<clusterName>.*<\/clusterName>/<clusterName>$CLUSTER_NAME<\/clusterName>/g;\
@@ -157,6 +159,21 @@ s/<\/hostRoleMapping>/\
 \n         <\/gfxd>\
 \n     <\/hostRoleMapping>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
 fi
+
+#######################################################################################
+#                           Oozie pre deployment
+#######################################################################################
+if (is_service_enabled "oozie"); then 
+  oozie_pre_deployment
+fi
+
+
+#######################################################################################
+#                           Hue pre deployment
+#######################################################################################
+if (is_service_enabled "hue"); then 
+  hue_pre_deployment
+fi
  
 xmlwf /home/gpadmin/ClusterConfigDir/clusterConfig.xml  
  
@@ -194,11 +211,19 @@ cstatus="unknown"; while [[ "$cstatus" != *"installed"* && "$cstatus" != *"insta
 sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $HAWQ_MASTER 'sudo ln -f -s /usr/java/default/bin/java /usr/bin/java'
 
 #######################################################################################
-#                           Oozie Deployment
+#                           Oozie deployment
 #######################################################################################
 if (is_service_enabled "oozie"); then
     # Oozie client node, Oozie Server node, Name Node, Root password
     oozie_deployment $CLIENT_NODE $MASTER_NODE $ROOT_PASSWORD
+fi
+
+#######################################################################################
+#                           Hue deployment
+#######################################################################################
+if (is_service_enabled "hue"); then
+    # Arguments: HUE_SERVER NAME_NODE RESOURCE_MANAGER_NODE HBASE_MASTER ROOT_PASSWORD
+    hue_deployment $MASTER_NODE $MASTER_NODE $MASTER_NODE $MASTER_NODE $ROOT_PASSWORD
 fi
 
 if (is_service_enabled "hawq"); then
@@ -229,6 +254,16 @@ if (is_service_enabled "oozie"); then
     # Arguments: Oozie Server node, Name Node, Root password
     oozie_post_initialization $MASTER_NODE $MASTER_NODE $ROOT_PASSWORD
 fi
+
+#######################################################################################
+#                           Hue post initialization
+#######################################################################################
+if (is_service_enabled "hue"); then
+    # Arguments: HUE_SERVER ROOT_PASSWORD
+    hue_post_initialization $MASTER_NODE $MASTER_NODE $ROOT_PASSWORD
+fi
+
+
 
 if (is_service_enabled "hawq"); then
 echo "********************************************************************************"
@@ -268,4 +303,9 @@ do
   echo "Install Hamster and GraphLab  on server: $graphlab_server"  
   sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $graphlab_server 'sudo yum -y install hamster-core openmpi hamster-rte graphlab'
 done
+fi
+
+if (is_service_enabled "sqoop"); then
+    # Arguments: SQOOP_CLIENT, SQOO_METASTORE, ROOT_PASSWORD
+    sqoop_post_initialization $MASTER_NODE $MASTER_NODE $ROOT_PASSWORD
 fi
