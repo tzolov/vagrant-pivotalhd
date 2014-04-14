@@ -47,8 +47,11 @@ JAVA_RPM_PATH = "/vagrant/jdk-7u45-linux-x64.rpm"
 #   bigdata/centos6.4_x86_64_small - just 8G of disk space. Not enough for Hue!
 VM_BOX = "bigdata/centos6.4_x86_64"
 
-# Memory (MB) allocated for every PHD node VM
-PHD_MEMORY_MB = "2048"
+# Memory (MB) allocated for the master PHD VM
+MASTER_PHD_MEMORY_MB = "2048"
+
+# Memory (MB) allocated for every PHD worker node VM
+WORKER_PHD_MEMORY_MB = "1536"
 
 # Memory (MB) allocated for the PCC VM
 PCC_MEMORY_MB = "768"
@@ -58,27 +61,31 @@ DEPLOY_PHD_CLUSTER = TRUE
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  # Compute the total number of nodes in the cluster 	
-  #NUMBER_OF_CLUSTER_NODES = MASTER.size + (MASTER.to_set ^ WORKERS.to_set).size
+  # Compute the total number of nodes in the cluster 	    
   NUMBER_OF_CLUSTER_NODES = (MASTER + WORKERS).uniq.size
   
   # Create VM for every PHD node
   (1..NUMBER_OF_CLUSTER_NODES).each do |i|
 
     phd_vm_name = "phd#{i}"
+    
+    phd_host_name = "phd#{i}.localdomain"
+    
+    # Compute the memory
+    vm_memory_mb = (MASTER.include? phd_host_name) ? MASTER_PHD_MEMORY_MB : WORKER_PHD_MEMORY_MB
 
     config.vm.define phd_vm_name.to_sym do |phd_conf|
       phd_conf.vm.box = VM_BOX
       phd_conf.vm.provider :virtualbox do |v|
         v.name = phd_vm_name
-        v.customize ["modifyvm", :id, "--memory", PHD_MEMORY_MB]
+        v.customize ["modifyvm", :id, "--memory", vm_memory_mb]
       end
       phd_conf.vm.provider "vmware_fusion" do |v|
         v.name = phd_vm_name
-        v.vmx["memsize"]  = PHD_MEMORY_MB
+        v.vmx["memsize"]  = vm_memory_mb
       end     	  
 
-      phd_conf.vm.host_name = "phd#{i}.localdomain"    
+      phd_conf.vm.host_name = phd_host_name    
       phd_conf.vm.network :private_network, ip: "10.211.55.#{i+100}"	  
 
       phd_conf.vm.provision "shell" do |s|
@@ -87,7 +94,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end 
 	  
       #Fix hostname FQDN
-      phd_conf.vm.provision :shell, :inline => "hostname phd#{i}.localdomain"
+      phd_conf.vm.provision :shell, :inline => "hostname #{phd_host_name}"
     end
   end
 
@@ -126,9 +133,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    # Deploy the PHD cluster
    if (DEPLOY_PHD_CLUSTER)
+
+     # Compute the HDFS replication factor as a function of the number of DataNodes
+     HDFS_REPLICATION_FACTOR = [3, WORKERS.uniq.size].min.to_s
+
      pcc.vm.provision "shell" do |s|
        s.path = "phd_cluster_deploy.sh"
-       s.args = [CLUSTER_NAME, SERVICES.uniq.join(","), MASTER.uniq.join(","), WORKERS.uniq.join(","), PHD_MEMORY_MB, JAVA_RPM_PATH]
+       s.args = [CLUSTER_NAME, SERVICES.uniq.join(","), MASTER.uniq.join(","), WORKERS.uniq.join(","), WORKER_PHD_MEMORY_MB, JAVA_RPM_PATH, HDFS_REPLICATION_FACTOR]
      end 
    end
    

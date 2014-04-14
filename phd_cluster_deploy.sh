@@ -14,7 +14,7 @@ source /vagrant/provision/oozie_service.sh
 source /vagrant/provision/hue_service.sh
 source /vagrant/provision/sqoop_service.sh
 
-[ "$#" -ne 6 ] && (echo "Expects 5 input agreements but found: $#"; exit 1)
+[ "$#" -ne 7 ] && (echo "Expects 7 input agreements but found: $#"; exit 1)
   
 # Sets the cluster name to be used in PCC (Pivotal Control Center)
 CLUSTER_NAME=$1
@@ -37,6 +37,9 @@ WORKER_NODES=$4
 PHD_MEMORY_MB=$5
  
 JAVA_RPM_PATH=$6 
+
+# HDFS replication factor - relative to the number of DataNodes
+HDFS_REPLICATION_FACTOR=$7 
  
 # By default the HAWQ master is collocated with the other master services.
 HAWQ_MASTER=$MASTER_NODE
@@ -73,9 +76,10 @@ is_service_enabled() {
 }
 
 echo "********************************************************************************"
-echo "*                 Deploy Cluster: $CLUSTER_NAME                    "
 echo "********************************************************************************"
- 
+echo "*                 Pre-Deploy Cluster: $CLUSTER_NAME                    "
+echo "********************************************************************************"
+echo "********************************************************************************"
 # Cluster is deployed as gpadmin user!
  
 # Pivotal HD manager deploys clusters using input from the cluster configuration directory. This cluster 
@@ -131,6 +135,13 @@ s/<yarn.resourcemanager.heapsize.mb>.*<\/yarn.resourcemanager.heapsize.mb>/<yarn
 s/<yarn.nodemanager.heapsize.mb>.*<\/yarn.nodemanager.heapsize.mb>/<yarn.nodemanager.heapsize.mb>$heap_memory_mb<\/yarn.nodemanager.heapsize.mb>/g;\
 s/<hbase.heapsize.mb>.*<\/hbase.heapsize.mb>/<hbase.heapsize.mb>$heap_memory_mb<\/hbase.heapsize.mb>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
 
+sed -i "s/<\/configuration>/\
+\n<property>\
+\n    <name>dfs.replication<\/name>\
+\n    <value>$HDFS_REPLICATION_FACTOR<\/value>\
+\n<\/property>\
+\n<\/configuration> /g;" /home/gpadmin/ClusterConfigDir/hdfs/hdfs-site.xml
+
 if (is_service_enabled "hbase"); then
 sed -i "\
 s/<hbase-master>.*<\/hbase-master>/<hbase-master>$MASTER_NODE<\/hbase-master>/g;\
@@ -180,6 +191,12 @@ xmlwf /home/gpadmin/ClusterConfigDir/clusterConfig.xml
 # Set vm.overcommit_memory to 1 to prevent OOM and other VM issues. 
 sed -i 's/vm.overcommit_memory = 2/vm.overcommit_memory = 0/g' /usr/lib/gphd/gphdmgr/hawq_sys_config/sysctl.conf
 
+echo "********************************************************************************"
+echo "********************************************************************************"
+echo "*                 Deploy Cluster: $CLUSTER_NAME                    "
+echo "********************************************************************************"
+echo "********************************************************************************"
+
 # Use ICM to perform the deploy
 # Note: deploy expects user inputs like root and gpadmin passwords. The 'expect' tool is used to emulate this user interaction. 
 cat > /home/gpadmin/deploy_cluster.exp <<EOF
@@ -207,6 +224,10 @@ printf "\n"
 # Wait until deployment complete (e.g. not in install_progress)
 cstatus="unknown"; while [[ "$cstatus" != *"installed"* && "$cstatus" != *"install_failed"* ]]; do cstatus=$(icm_client list | grep "$CLUSTER_NAME"| awk '{ print $11}');  echo "[$(date +'%H:%M:%S')] $CLUSTER_NAME Status: $cstatus "; sleep 20; done
 
+echo "********************************************************************************"
+echo "*                 Post-Deploy Cluster: $CLUSTER_NAME                    "
+echo "********************************************************************************"
+
 # Fix Hive's java5 override. 
 sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $HAWQ_MASTER 'sudo ln -f -s /usr/java/default/bin/java /usr/bin/java'
 
@@ -227,16 +248,16 @@ if (is_service_enabled "hue"); then
 fi
 
 if (is_service_enabled "hawq"); then
-echo "********************************************************************************"
-echo "*                    HAWQ - post deploy configuration                   "
-echo "********************************************************************************"
+   echo "---------------------------------------------------------------------------------"
+   echo "*                    HAWQ - post deploy configuration                   "
+   echo "---------------------------------------------------------------------------------"
 
-su - -c "echo $HAWQ_SEGMENT_HOSTS  | tr , '\n' > /home/gpadmin/HAWQ_Segment_Hosts.txt" gpadmin
+   su - -c "echo $HAWQ_SEGMENT_HOSTS  | tr , '\n' > /home/gpadmin/HAWQ_Segment_Hosts.txt" gpadmin
  
-su - -c "\
-scp /home/gpadmin/HAWQ_Segment_Hosts.txt gpadmin@$HAWQ_MASTER:/home/gpadmin/HAWQ_Segment_Hosts.txt;\
-ssh gpadmin@$HAWQ_MASTER 'source /usr/local/hawq/greenplum_path.sh;\
-/usr/local/hawq/bin/gpssh-exkeys -f /home/gpadmin/HAWQ_Segment_Hosts.txt -p $GPADMIN_PASSWORD'" gpadmin
+   su - -c "\
+    scp /home/gpadmin/HAWQ_Segment_Hosts.txt gpadmin@$HAWQ_MASTER:/home/gpadmin/HAWQ_Segment_Hosts.txt;\
+    ssh gpadmin@$HAWQ_MASTER 'source /usr/local/hawq/greenplum_path.sh;\
+    /usr/local/hawq/bin/gpssh-exkeys -f /home/gpadmin/HAWQ_Segment_Hosts.txt -p $GPADMIN_PASSWORD'" gpadmin
 fi
  
 echo "********************************************************************************"
@@ -266,43 +287,44 @@ fi
 
 
 if (is_service_enabled "hawq"); then
-echo "********************************************************************************"
-echo "*                       Initialise HAWQ   									  "
-echo "********************************************************************************"
+   echo "---------------------------------------------------------------------------------"
+   echo "*                       Initialise HAWQ   									  "
+   echo "---------------------------------------------------------------------------------"
 
-su - -c "ssh gpadmin@$HAWQ_MASTER '/etc/init.d/hawq init'" gpadmin;
+   su - -c "ssh gpadmin@$HAWQ_MASTER '/etc/init.d/hawq init'" gpadmin;
 fi
 
 if (is_service_enabled "gfxd"); then
-echo "********************************************************************************"
-echo "*                       Initialise GemFireXD   							      "
-echo "********************************************************************************"
+   echo "---------------------------------------------------------------------------------"
+   echo "*                       Initialise GemFireXD 				      "
+   echo "---------------------------------------------------------------------------------"
 
-echo "Initialize GFXD locator: $GFXD_LOCATOR"
-  su - -c "ssh gpadmin@$GFXD_LOCATOR 'export GFXD_JAVA=/usr/java/default/bin/java; mkdir /tmp/locator; \
-nohup sqlf locator start -peer-discovery-address=$GFXD_LOCATOR -dir=/tmp/locator -jmx-manager-start=true -jmx-manager-http-port=7075 & '" gpadmin
+   echo "Initialize GFXD locator: $GFXD_LOCATOR"
+   su - -c "ssh gpadmin@$GFXD_LOCATOR 'export GFXD_JAVA=/usr/java/default/bin/java; mkdir /tmp/locator; \
+       nohup sqlf locator start -peer-discovery-address=$GFXD_LOCATOR -dir=/tmp/locator -jmx-manager-start=true -jmx-manager-http-port=7075 & '" gpadmin
 
-echo "Start the Pulse monitoring tool by opening: http://10.211.55.101:7075/pulse/clusterDetail.html  username: admin and password: admin. "
+   echo "Start the Pulse monitoring tool by opening: http://10.211.55.101:7075/pulse/clusterDetail.html  username: admin and password: admin. "
 
-for gfxd_server in ${GFXD_SERVERS//,/ }
-do
-  echo "Initialize GFXD server: $gfxd_server"
-  su - -c "ssh gpadmin@$gfxd_server 'export GFXD_JAVA=/usr/java/default/bin/java; mkdir /tmp/server; \
-nohup sqlf server start -locators=$GFXD_LOCATOR[10334] -bind-address=$gfxd_server -client-port=1528 -dir=/tmp/server &'" gpadmin
-done
+   for gfxd_server in ${GFXD_SERVERS//,/ }
+   do
+     echo "Initialize GFXD server: $gfxd_server"
+     su - -c "ssh gpadmin@$gfxd_server 'export GFXD_JAVA=/usr/java/default/bin/java; mkdir /tmp/server; \
+      nohup sqlf server start -locators=$GFXD_LOCATOR[10334] -bind-address=$gfxd_server -client-port=1528 -dir=/tmp/server &'" gpadmin
+   done
 fi
 
 if (is_service_enabled "graphlab"); then
-echo "********************************************************************************"
-echo "*                       Instal Hamster & GraphLab   						      "
-echo "********************************************************************************"
 
-CLIENT_AND_WORKER_NODES=$CLIENT_NODE,$WORKER_NODES
-for graphlab_server in ${CLIENT_AND_WORKER_NODES//,/ }
-do
-  echo "Install Hamster and GraphLab  on server: $graphlab_server"  
-  sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $graphlab_server 'sudo yum -y install hamster-core openmpi hamster-rte graphlab'
-done
+   echo "---------------------------------------------------------------------------------"
+   echo "*                       Instal Hamster & GraphLab  			          "
+   echo "---------------------------------------------------------------------------------"
+
+   CLIENT_AND_WORKER_NODES=$CLIENT_NODE,$WORKER_NODES
+   for graphlab_server in ${CLIENT_AND_WORKER_NODES//,/ }
+   do
+     echo "Install Hamster and GraphLab  on server: $graphlab_server"  
+     sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $graphlab_server 'sudo yum -y install hamster-core openmpi hamster-rte graphlab'
+   done
 fi
 
 if (is_service_enabled "sqoop"); then
