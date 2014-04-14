@@ -58,8 +58,7 @@ DEPLOY_PHD_CLUSTER = TRUE
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  # Compute the total number of nodes in the cluster 	
-  #NUMBER_OF_CLUSTER_NODES = MASTER.size + (MASTER.to_set ^ WORKERS.to_set).size
+  # Compute the total number of nodes in the cluster 	    
   NUMBER_OF_CLUSTER_NODES = (MASTER + WORKERS).uniq.size
   
   # Create VM for every PHD node
@@ -126,9 +125,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    # Deploy the PHD cluster
    if (DEPLOY_PHD_CLUSTER)
+
+     # Compute the HDFS replication factor as a function of the number of DataNodes
+     HDFS_REPLICATION_FACTOR = [3, WORKERS.uniq.size].min.to_s
+
      pcc.vm.provision "shell" do |s|
        s.path = "phd_cluster_deploy.sh"
-       s.args = [CLUSTER_NAME, SERVICES.uniq.join(","), MASTER.uniq.join(","), WORKERS.uniq.join(","), PHD_MEMORY_MB, JAVA_RPM_PATH]
+       s.args = [CLUSTER_NAME, SERVICES.uniq.join(","), MASTER.uniq.join(","), WORKERS.uniq.join(","), PHD_MEMORY_MB, JAVA_RPM_PATH, HDFS_REPLICATION_FACTOR]
      end 
    end
    
