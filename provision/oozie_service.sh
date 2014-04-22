@@ -1,47 +1,45 @@
 #!/bin/bash
 
- 
-#######################################################################################
-# oozie_pre_deployment() - 
-#######################################################################################
-oozie_pre_deployment() {
+# oozie_pre_deploy() - 
 
-sed -i "s/<configuration>/\
-\<!-- Configure Hadoop to accept the oozie user to be a proxyuser -->\
-\n<configuration>\
-\n<property>\
-\n    <name>hadoop.proxyuser.oozie.hosts<\/name>\
-\n    <value>*<\/value>\
-\n<\/property>\
-\n<property>\
-\n    <name>hadoop.proxyuser.oozie.groups<\/name>\
-\n    <value>*<\/value>\
-\n<\/property> /g;" /home/gpadmin/ClusterConfigDir/hdfs/core-site.xml
+oozie_pre_deploy() {
+   echo "--------------------------------------------------------------------------------"
+   echo "                    OOZIE - Pre Deploy                                     "
+   echo "--------------------------------------------------------------------------------"
 
+   sed -i "s/<configuration>/\
+   \<!-- Configure Hadoop to accept the oozie user to be a proxyuser -->\
+   \n<configuration>\
+   \n<property>\
+   \n    <name>hadoop.proxyuser.oozie.hosts<\/name>\
+   \n    <value>*<\/value>\
+   \n<\/property>\
+   \n<property>\
+   \n    <name>hadoop.proxyuser.oozie.groups<\/name>\
+   \n    <value>*<\/value>\
+   \n<\/property> /g;" /home/gpadmin/ClusterConfigDir/hdfs/core-site.xml
 }
  
-#######################################################################################
-# oozie_deployment() - Deploys the Oozie client and server packages
+
+# oozie_post_deploy() - Deploys the Oozie client and server packages
 #
 # Arguments:
 # - OOZIE_CLIENT - The FQDM of Qozi client node
 # - OOZIE_SERVER - The FQDM of Qozi Server node
 # - ROOT_PASSWORD - Oozi server root password
-#######################################################################################
-oozie_deployment() {
 
-echo "********************************************************************************"
-echo "*                    OOZIE - Deployment                                         "
-echo "********************************************************************************"
+oozie_post_deploy() {
 
-OOZIE_CLIENT="$1"
+   echo "--------------------------------------------------------------------------------"
+   echo "                    OOZIE - Post Deploy                                    "
+   echo "--------------------------------------------------------------------------------"
 
-OOZIE_SERVER="$2"
-	
-ROOT_PASSWORD="$3"
+   OOZIE_CLIENT="$1"
+   OOZIE_SERVER="$2"	
+   ROOT_PASSWORD="$3"
 
-# Deploy Oozie client 
-sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $OOZIE_CLIENT 'sudo yum -y install oozie-client'
+   # Deploy Oozie client 
+   sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $OOZIE_CLIENT 'sudo yum -y install oozie-client'
 
 # Deploy Oozie server
 cat > /home/gpadmin/oozie_server_deploy_tmp.sh <<EOF 
@@ -73,41 +71,37 @@ sudo -u oozie oozie-setup prepare-war -d /tmp/oozie-libext/
 
 EOF
 
-su - -c "scp ./oozie_server_deploy_tmp.sh gpadmin@$OOZIE_SERVER:/home/gpadmin/oozie_server_deploy_tmp.sh;\
-ssh gpadmin@$OOZIE_SERVER 'chmod a+x /home/gpadmin/oozie_server_deploy_tmp.sh;'" gpadmin
+   su - -c "scp ./oozie_server_deploy_tmp.sh gpadmin@$OOZIE_SERVER:/home/gpadmin/oozie_server_deploy_tmp.sh;\
+   ssh gpadmin@$OOZIE_SERVER 'chmod a+x /home/gpadmin/oozie_server_deploy_tmp.sh;'" gpadmin
 
-sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $OOZIE_SERVER 'sudo /home/gpadmin/oozie_server_deploy_tmp.sh'
-
+   sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $OOZIE_SERVER 'sudo /home/gpadmin/oozie_server_deploy_tmp.sh'
 }
 
-#######################################################################################
-# oozie_post_initialization() - Completes Oozie server installation
+# oozie_post_cluster_start() - Completes Oozie server installation
 #
 # Arguments:
 # - OOZIE_SERVER  - The FQDM of Qozi Server node
 # - NAME_NODE     - The FQDM of NameNode
 # - ROOT_PASSWORD - Oozi server root password
-#######################################################################################
-oozie_post_initialization() {
 
-echo "********************************************************************************"
-echo "*                    OOZIE - Post initialization                                "
-echo "********************************************************************************"
+oozie_post_cluster_start() {
 
-OOZIE_SERVER="$1"
-NAME_NODE="$2"	
-ROOT_PASSWORD="$3"
+   echo "--------------------------------------------------------------------------------"
+   echo "                    OOZIE - Post Cluster Start                                "
+   echo "--------------------------------------------------------------------------------"
+
+   OOZIE_SERVER="$1"
+   NAME_NODE="$2"	
+   ROOT_PASSWORD="$3"
 
 cat > /home/gpadmin/oozie_server_post_initialization_tmp.sh <<EOF 
-
 sudo -u oozie oozie-setup sharelib create -fs hdfs://$NAME_NODE:8020 -locallib /usr/lib/gphd/oozie/oozie-sharelib.tar.gz
-
 sudo service oozie start
 EOF
 
-su - -c "\
-scp ./oozie_server_post_initialization_tmp.sh gpadmin@$OOZIE_SERVER:/home/gpadmin/oozie_server_post_initialization_tmp.sh;\
-ssh gpadmin@$OOZIE_SERVER 'chmod a+x /home/gpadmin/oozie_server_post_initialization_tmp.sh;'" gpadmin
-sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $OOZIE_SERVER 'sudo /home/gpadmin/oozie_server_post_initialization_tmp.sh'
+   su - -c "\
+   scp ./oozie_server_post_initialization_tmp.sh gpadmin@$OOZIE_SERVER:/home/gpadmin/oozie_server_post_initialization_tmp.sh;\
+   ssh gpadmin@$OOZIE_SERVER 'chmod a+x /home/gpadmin/oozie_server_post_initialization_tmp.sh;'" gpadmin
 
+   sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $OOZIE_SERVER 'sudo /home/gpadmin/oozie_server_post_initialization_tmp.sh'
 }

@@ -1,39 +1,35 @@
 #!/bin/bash
 
-#######################################################################################
-# hue_pre_deployment() - HUE server configurations before deployment
-#######################################################################################
 
-hue_pre_deployment() {
+# hue_pre_deploy() - HUE server configurations before deployment
 
-echo "********************************************************************************"
-echo "*                    HUE - Pre Deployment                                         "
-echo "********************************************************************************"
+hue_pre_deploy() {
 
+   echo "--------------------------------------------------------------------------------"
+   echo "                    HUE - Pre Deploy                                       "
+   echo "--------------------------------------------------------------------------------"
 
-sed -i "\
-s/<configuration>/\
-\n<configuration>\
-\n<property>\
-\n    <name>hadoop.proxyuser.hue.hosts<\/name>\
-\n    <value>*<\/value>\
-\n<\/property>\
-\n<property>\
-\n    <name>hadoop.proxyuser.hue.groups<\/name>\
-\n    <value>*<\/value>\
-\n<\/property> /g;" /home/gpadmin/ClusterConfigDir/hdfs/core-site.xml
+   sed -i "s/<configuration>/\
+   \n<configuration>\
+   \n<property>\
+   \n    <name>hadoop.proxyuser.hue.hosts<\/name>\
+   \n    <value>*<\/value>\
+   \n<\/property>\
+   \n<property>\
+   \n    <name>hadoop.proxyuser.hue.groups<\/name>\
+   \n    <value>*<\/value>\
+   \n<\/property> /g;" /home/gpadmin/ClusterConfigDir/hdfs/core-site.xml
 
-sed -i "s/<configuration>/\
-\n<configuration>\
-\n<property>\
-\n    <name>dfs.webhdfs.enabled<\/name>\
-\n    <value>true<\/value>\
-\n<\/property> /g;" /home/gpadmin/ClusterConfigDir/hdfs/hdfs-site.xml
-
+   sed -i "s/<configuration>/\
+   \n<configuration>\
+   \n<property>\
+   \n    <name>dfs.webhdfs.enabled<\/name>\
+   \n    <value>true<\/value>\
+   \n<\/property> /g;" /home/gpadmin/ClusterConfigDir/hdfs/hdfs-site.xml
 }
 
-#######################################################################################
-# hue_deployment() - Deploys the HUE server packages
+
+# hue_post_deploy() - Deploys the HUE server packages
 #
 # Arguments:
 # - HUE_SERVER - HUE Server node FQDM
@@ -41,19 +37,18 @@ sed -i "s/<configuration>/\
 # - RESOURCE_MANAGER_NODE - Yarn ResourceManager FQDM
 # - HBASE_MASTER - HBase master node FQDM
 # - ROOT_PASSWORD - HUE server root password
-#######################################################################################
 
-hue_deployment() {
+hue_post_deploy() {
 
-echo "********************************************************************************"
-echo "*                    HUE - Deployment                                         "
-echo "********************************************************************************"
+   echo "--------------------------------------------------------------------------------"
+   echo "                     HUE - Post Deploy                                      "
+   echo "--------------------------------------------------------------------------------"
 
-HUE_SERVER=$1
-NAME_NODE=$2
-RESOURCE_MANAGER_NODE=$3
-HBASE_MASTER=$4
-ROOT_PASSWORD=$5
+   HUE_SERVER=$1
+   NAME_NODE=$2
+   RESOURCE_MANAGER_NODE=$3
+   HBASE_MASTER=$4
+   ROOT_PASSWORD=$5
 
 cat > /home/gpadmin/hue_deployment.sh <<EOF
 
@@ -82,36 +77,32 @@ sudo sed -i "s/## hbase_clusters=(Cluster|localhost:9090)/hbase_clusters=(Cluste
 
 sudo sed -i "s/## server_url=http:\/\/localhost:12000\/sqoop/server_url=http:\/\/$NAME_NODE:12000\/sqoop/g;" /usr/share/hue/desktop/conf/hue.ini 
   
-
 EOF
 
-su - -c "scp ./hue_deployment.sh gpadmin@$MASTER_NODE:/home/gpadmin/hue_deployment.sh;ssh gpadmin@$MASTER_NODE 'chmod a+x /home/gpadmin/hue_deployment.sh;'" gpadmin
+   su - -c "scp ./hue_deployment.sh gpadmin@$MASTER_NODE:/home/gpadmin/hue_deployment.sh;ssh gpadmin@$MASTER_NODE 'chmod a+x /home/gpadmin/hue_deployment.sh;'" gpadmin
 
-sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $MASTER_NODE 'sudo /home/gpadmin/hue_deployment.sh'
+   sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $MASTER_NODE 'sudo /home/gpadmin/hue_deployment.sh'
 
 }
 
-#######################################################################################
-# hue_post_initialization() - Completes HUE server installation
+# hue_post_cluster_start() - Completes HUE server installation
 #
 # Arguments:
 # - HUE_SERVER  - The FQDM of HUE server node
 # - HBASE_MASTER - HBase master node FQDM
 # - ROOT_PASSWORD - Oozi server root password
-#######################################################################################
 
-hue_post_initialization() {
+hue_post_cluster_start() {
 
-echo "********************************************************************************"
-echo "*                    HUE - Post Initialization                                  "
-echo "********************************************************************************"
+   echo "--------------------------------------------------------------------------------"
+   echo "                    HUE - Post Cluster Start                                   "
+   echo "--------------------------------------------------------------------------------"
 
-HUE_SERVER=$1
-HBASE_MASTER=$2
-ROOT_PASSWORD=$3
+   HUE_SERVER=$1
+   HBASE_MASTER=$2
+   ROOT_PASSWORD=$3
 
-su - -c "ssh gpadmin@$HBASE_MASTER 'nohup /usr/bin/hbase thrift start > /dev/null 2>&1 &'" gpadmin
+   su - -c "ssh gpadmin@$HBASE_MASTER 'nohup /usr/bin/hbase thrift start > /dev/null 2>&1 &'" gpadmin
 
-sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $HUE_SERVER 'nohup sudo /usr/share/hue/build/env/bin/supervisor > /dev/null 2>&1 &'
-
+   sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $HUE_SERVER 'nohup sudo /usr/share/hue/build/env/bin/supervisor > /dev/null 2>&1 &'
 }

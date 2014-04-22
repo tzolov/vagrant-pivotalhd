@@ -48,10 +48,10 @@ JAVA_RPM_PATH = "/vagrant/jdk-7u45-linux-x64.rpm"
 VM_BOX = "bigdata/centos6.4_x86_64"
 
 # Memory (MB) allocated for the master PHD VM
-MASTER_PHD_MEMORY_MB = "2048"
+MASTER_PHD_MEMORY_MB = "3072"
 
 # Memory (MB) allocated for every PHD worker node VM
-WORKER_PHD_MEMORY_MB = "1536"
+WORKER_PHD_MEMORY_MB = "2048"
 
 # Memory (MB) allocated for the PCC VM
 PCC_MEMORY_MB = "768"

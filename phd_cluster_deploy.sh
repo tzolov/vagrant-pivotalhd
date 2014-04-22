@@ -13,6 +13,9 @@
 source /vagrant/provision/oozie_service.sh
 source /vagrant/provision/hue_service.sh
 source /vagrant/provision/sqoop_service.sh
+source /vagrant/provision/graphlab_service.sh
+source /vagrant/provision/gfxd_service.sh
+source /vagrant/provision/hawq_service.sh
 
 [ "$#" -ne 7 ] && (echo "Expects 7 input agreements but found: $#"; exit 1)
   
@@ -76,9 +79,7 @@ is_service_enabled() {
 }
 
 echo "********************************************************************************"
-echo "********************************************************************************"
 echo "*                 Pre-Deploy Cluster: $CLUSTER_NAME                    "
-echo "********************************************************************************"
 echo "********************************************************************************"
 # Cluster is deployed as gpadmin user!
  
@@ -99,7 +100,7 @@ su - -c "icm_client fetch-template -o ~/ClusterConfigDir" gpadmin
 #                   | hbase-master,hive-server,hive-metastore,hawq-master,hawq-standbymaste,hawq-segment,
 #                   | gpxf-agent
 #                   |
-# WORKER_NODES       | datanode,yarn-nodemanager,zookeeper-server,hbase-regionserver,hawq-segment,gpxf-agent 
+# WORKER_NODES      | datanode,yarn-nodemanager,zookeeper-server,hbase-regionserver,hawq-segment,gpxf-agent 
 # ---------------------------------------------------------------------------------------------------------
 
 # Apply the mapping convention (above) to the default clusterConfig.xml.
@@ -142,59 +143,44 @@ sed -i "s/<\/configuration>/\
 \n<\/property>\
 \n<\/configuration> /g;" /home/gpadmin/ClusterConfigDir/hdfs/hdfs-site.xml
 
+# Configuration per service
+
 if (is_service_enabled "hbase"); then
-sed -i "\
-s/<hbase-master>.*<\/hbase-master>/<hbase-master>$MASTER_NODE<\/hbase-master>/g;\
-s/<hbase-regionserver>.*<\/hbase-regionserver>/<hbase-regionserver>$WORKER_NODES<\/hbase-regionserver>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
+   sed -i "\
+   s/<hbase-master>.*<\/hbase-master>/<hbase-master>$MASTER_NODE<\/hbase-master>/g;\
+   s/<hbase-regionserver>.*<\/hbase-regionserver>/<hbase-regionserver>$WORKER_NODES<\/hbase-regionserver>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
 fi
 
 if (is_service_enabled "hive"); then
-sed -i "\
-s/<hive-server>.*<\/hive-server>/<hive-server>$MASTER_NODE<\/hive-server>/g;\
-s/<hive-metastore>.*<\/hive-metastore>/<hive-metastore>$MASTER_NODE<\/hive-metastore>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
+   sed -i "\
+   s/<hive-server>.*<\/hive-server>/<hive-server>$MASTER_NODE<\/hive-server>/g;\
+   s/<hive-metastore>.*<\/hive-metastore>/<hive-metastore>$MASTER_NODE<\/hive-metastore>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
 fi
 
 if (is_service_enabled "hawq"); then
-sed -i "\
-s/<hawq-master>.*<\/hawq-master>/<hawq-master>$HAWQ_MASTER<\/hawq-master>/g;\
-s/<hawq-standbymaster>.*<\/hawq-standbymaster>/<hawq-standbymaster>$HAWQ_MASTER<\/hawq-standbymaster>/g;\
-s/<hawq-segment>.*<\/hawq-segment>/<hawq-segment>$HAWQ_SEGMENT_HOSTS<\/hawq-segment>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
+   hawq_pre_deploy $HAWQ_MASTER $HAWQ_SEGMENT_HOSTS
 fi
 
 if (is_service_enabled "gfxd"); then
-sed -i "\
-s/<\/hostRoleMapping>/\
-\n         <gfxd>\
-\n            <gfxd-locator>$GFXD_LOCATOR<\/gfxd-locator>\
-\n            <gfxd-server>$GFXD_SERVERS<\/gfxd-server>\
-\n         <\/gfxd>\
-\n     <\/hostRoleMapping>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
+   gfxd_pre_deploy $GFXD_LOCATOR $GFXD_SERVERS
 fi
 
-#######################################################################################
-#                           Oozie pre deployment
-#######################################################################################
 if (is_service_enabled "oozie"); then 
-  oozie_pre_deployment
+  oozie_pre_deploy
 fi
 
-
-#######################################################################################
-#                           Hue pre deployment
-#######################################################################################
 if (is_service_enabled "hue"); then 
-  hue_pre_deployment
+  hue_pre_deploy
 fi
- 
+
+# clusterConfig.xml wellformness check
 xmlwf /home/gpadmin/ClusterConfigDir/clusterConfig.xml  
  
 # Set vm.overcommit_memory to 1 to prevent OOM and other VM issues. 
 sed -i 's/vm.overcommit_memory = 2/vm.overcommit_memory = 0/g' /usr/lib/gphd/gphdmgr/hawq_sys_config/sysctl.conf
 
 echo "********************************************************************************"
-echo "********************************************************************************"
 echo "*                 Deploy Cluster: $CLUSTER_NAME                    "
-echo "********************************************************************************"
 echo "********************************************************************************"
 
 # Use ICM to perform the deploy
@@ -231,33 +217,18 @@ echo "**************************************************************************
 # Fix Hive's java5 override. 
 sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $HAWQ_MASTER 'sudo ln -f -s /usr/java/default/bin/java /usr/bin/java'
 
-#######################################################################################
-#                           Oozie deployment
-#######################################################################################
 if (is_service_enabled "oozie"); then
     # Oozie client node, Oozie Server node, Name Node, Root password
-    oozie_deployment $CLIENT_NODE $MASTER_NODE $ROOT_PASSWORD
+    oozie_post_deploy $CLIENT_NODE $MASTER_NODE $ROOT_PASSWORD
 fi
 
-#######################################################################################
-#                           Hue deployment
-#######################################################################################
 if (is_service_enabled "hue"); then
     # Arguments: HUE_SERVER NAME_NODE RESOURCE_MANAGER_NODE HBASE_MASTER ROOT_PASSWORD
-    hue_deployment $MASTER_NODE $MASTER_NODE $MASTER_NODE $MASTER_NODE $ROOT_PASSWORD
+    hue_post_deploy $MASTER_NODE $MASTER_NODE $MASTER_NODE $MASTER_NODE $ROOT_PASSWORD
 fi
 
 if (is_service_enabled "hawq"); then
-   echo "---------------------------------------------------------------------------------"
-   echo "*                    HAWQ - post deploy configuration                   "
-   echo "---------------------------------------------------------------------------------"
-
-   su - -c "echo $HAWQ_SEGMENT_HOSTS  | tr , '\n' > /home/gpadmin/HAWQ_Segment_Hosts.txt" gpadmin
- 
-   su - -c "\
-    scp /home/gpadmin/HAWQ_Segment_Hosts.txt gpadmin@$HAWQ_MASTER:/home/gpadmin/HAWQ_Segment_Hosts.txt;\
-    ssh gpadmin@$HAWQ_MASTER 'source /usr/local/hawq/greenplum_path.sh;\
-    /usr/local/hawq/bin/gpssh-exkeys -f /home/gpadmin/HAWQ_Segment_Hosts.txt -p $GPADMIN_PASSWORD'" gpadmin
+   hawq_post_deploy $HAWQ_MASTER $HAWQ_SEGMENT_HOSTS $GPADMIN_PASSWORD
 fi
  
 echo "********************************************************************************"
@@ -268,66 +239,34 @@ su - -c "icm_client list" gpadmin
   
 su - -c "icm_client start -l $CLUSTER_NAME" gpadmin
 
-#######################################################################################
-#                       Oozie post initialization
-#######################################################################################
+echo "********************************************************************************"
+echo "*                 Post-Start Cluster: $CLUSTER_NAME                             "
+echo "********************************************************************************"
+
 if (is_service_enabled "oozie"); then
     # Arguments: Oozie Server node, Name Node, Root password
-    oozie_post_initialization $MASTER_NODE $MASTER_NODE $ROOT_PASSWORD
+    oozie_post_cluster_start $MASTER_NODE $MASTER_NODE $ROOT_PASSWORD
 fi
 
-#######################################################################################
-#                           Hue post initialization
-#######################################################################################
 if (is_service_enabled "hue"); then
     # Arguments: HUE_SERVER ROOT_PASSWORD
-    hue_post_initialization $MASTER_NODE $MASTER_NODE $ROOT_PASSWORD
+    hue_post_cluster_start $MASTER_NODE $MASTER_NODE $ROOT_PASSWORD
 fi
 
-
-
 if (is_service_enabled "hawq"); then
-   echo "---------------------------------------------------------------------------------"
-   echo "*                       Initialise HAWQ   									  "
-   echo "---------------------------------------------------------------------------------"
-
-   su - -c "ssh gpadmin@$HAWQ_MASTER '/etc/init.d/hawq init'" gpadmin;
+   hawq_post_cluster_start
 fi
 
 if (is_service_enabled "gfxd"); then
-   echo "---------------------------------------------------------------------------------"
-   echo "*                       Initialise GemFireXD 				      "
-   echo "---------------------------------------------------------------------------------"
-
-   echo "Initialize GFXD locator: $GFXD_LOCATOR"
-   su - -c "ssh gpadmin@$GFXD_LOCATOR 'export GFXD_JAVA=/usr/java/default/bin/java; mkdir /tmp/locator; \
-       nohup sqlf locator start -peer-discovery-address=$GFXD_LOCATOR -dir=/tmp/locator -jmx-manager-start=true -jmx-manager-http-port=7075 & '" gpadmin
-
-   echo "Start the Pulse monitoring tool by opening: http://10.211.55.101:7075/pulse/clusterDetail.html  username: admin and password: admin. "
-
-   for gfxd_server in ${GFXD_SERVERS//,/ }
-   do
-     echo "Initialize GFXD server: $gfxd_server"
-     su - -c "ssh gpadmin@$gfxd_server 'export GFXD_JAVA=/usr/java/default/bin/java; mkdir /tmp/server; \
-      nohup sqlf server start -locators=$GFXD_LOCATOR[10334] -bind-address=$gfxd_server -client-port=1528 -dir=/tmp/server &'" gpadmin
-   done
+   gfxd_post_cluster_start $GFXD_LOCATOR $GFXD_SERVERS
 fi
 
 if (is_service_enabled "graphlab"); then
-
-   echo "---------------------------------------------------------------------------------"
-   echo "*                       Instal Hamster & GraphLab  			          "
-   echo "---------------------------------------------------------------------------------"
-
-   CLIENT_AND_WORKER_NODES=$CLIENT_NODE,$WORKER_NODES
-   for graphlab_server in ${CLIENT_AND_WORKER_NODES//,/ }
-   do
-     echo "Install Hamster and GraphLab  on server: $graphlab_server"  
-     sshpass -p $ROOT_PASSWORD ssh -o StrictHostKeyChecking=no $graphlab_server 'sudo yum -y install hamster-core openmpi hamster-rte graphlab'
-   done
+    #CLIENT_NODE, WORKER_NODES, ROOT_PASSWORD
+    graphlab_post_cluster_start $CLIENT_NODE $WORKER_NODES $ROOT_PASSWOR
 fi
 
 if (is_service_enabled "sqoop"); then
     # Arguments: SQOOP_CLIENT, SQOO_METASTORE, ROOT_PASSWORD
-    sqoop_post_initialization $MASTER_NODE $MASTER_NODE $ROOT_PASSWORD
+    sqoop_post_cluster_start $MASTER_NODE $MASTER_NODE $ROOT_PASSWORD
 fi
