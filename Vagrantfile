@@ -17,7 +17,7 @@ MASTER = ["phd1.localdomain"]
 
 # Node(s) to be used as a Workers. Convention is: 'phd<Number>.localdomain'. At least one worker node is required
 # The master node can be reused as a worker. 
-WORKERS = ["phd1.localdomain", "phd2.localdomain"]
+WORKERS = ["phd2.localdomain", "phd3.localdomain"]
 
 # Some commonly used PHD distributions are predefined below. Select one and assign it to PHD_DISTRIBUTION_TO_INSTALL 
 # To install different packages versions put those packages in the Vagrantfile folder and define 
@@ -51,7 +51,8 @@ VM_BOX = "bigdata/centos6.4_x86_64"
 MASTER_PHD_MEMORY_MB = "2048"
 
 # Memory (MB) allocated for every PHD node VM
-WORKER_PHD_MEMORY_MB = "1536"
+#WORKER_PHD_MEMORY_MB = "1536"
+WORKER_PHD_MEMORY_MB = "2048"
 
 # Memory (MB) allocated for the PCC VM
 PCC_MEMORY_MB = "768"
