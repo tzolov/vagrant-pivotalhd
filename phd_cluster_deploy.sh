@@ -118,18 +118,19 @@ s/<secondarynamenode>.*<\/secondarynamenode>/<secondarynamenode>$MASTER_NODE<\/s
 s/<yarn-resourcemanager>.*<\/yarn-resourcemanager>/<yarn-resourcemanager>$MASTER_NODE<\/yarn-resourcemanager>/g;\
 s/<yarn-nodemanager>.*<\/yarn-nodemanager>/<yarn-nodemanager>$WORKER_NODES<\/yarn-nodemanager>/g;\
 s/<mapreduce-historyserver>.*<\/mapreduce-historyserver>/<mapreduce-historyserver>$MASTER_NODE<\/mapreduce-historyserver>/g;\
-s/<zookeeper-server>.*<\/zookeeper-server>/<zookeeper-server>$MASTER_NODE<\/zookeeper-server>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
-#s/<zookeeper-server>.*<\/zookeeper-server>/<zookeeper-server>$WORKER_NODES<\/zookeeper-server>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
+s/<zookeeper-server>.*<\/zookeeper-server>/<zookeeper-server>$WORKER_NODES<\/zookeeper-server>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
+#s/<zookeeper-server>.*<\/zookeeper-server>/<zookeeper-server>$MASTER_NODE<\/zookeeper-server>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
 
 # Configure the YARN and Heap memory relative to the available VM memory size
-nm_resource_memory_mb=$(((PHD_MEMORY_MB / 100) * 90))
-nm_resource_memory_mb_85_percent=$(((PHD_MEMORY_MB / 100) * 85))
-yarn_scheduler_minimum_allocation_mb=$(($nm_resource_memory_mb_85_percent<1024?$nm_resource_memory_mb_85_percent:1024))
-heap_memory_mb=$(($nm_resource_memory_mb_85_percent<2048?$nm_resource_memory_mb_85_percent:2048))
+nm_resource_memory_mb=$(((PHD_MEMORY_MB / 100) * 95))
+scheduler_min_allocation_mb=$(((PHD_MEMORY_MB / 100) * 60))
+nm_resource_memory_mb_90_percent=$(((PHD_MEMORY_MB / 100) * 90))
+yarn_scheduler_minimum_allocation_mb=$(($nm_resource_memory_mb_90_percent<1024?$nm_resource_memory_mb_90_percent:1024))
+heap_memory_mb=$(($nm_resource_memory_mb_90_percent<2048?$nm_resource_memory_mb_90_percent:2048))
 
 sed -i "\
 s/<yarn.nodemanager.resource.memory-mb>.*<\/yarn.nodemanager.resource.memory-mb>/<yarn.nodemanager.resource.memory-mb>$nm_resource_memory_mb<\/yarn.nodemanager.resource.memory-mb>/g;\
-s/<yarn.scheduler.minimum-allocation-mb>.*<\/yarn.scheduler.minimum-allocation-mb>/<yarn.scheduler.minimum-allocation-mb>$yarn_scheduler_minimum_allocation_mb<\/yarn.scheduler.minimum-allocation-mb>/g;\
+s/<yarn.scheduler.minimum-allocation-mb>.*<\/yarn.scheduler.minimum-allocation-mb>/<yarn.scheduler.minimum-allocation-mb>$scheduler_min_allocation_mb<\/yarn.scheduler.minimum-allocation-mb>/g;\
 s/<dfs.namenode.heapsize.mb>.*<\/dfs.namenode.heapsize.mb>/<dfs.namenode.heapsize.mb>$heap_memory_mb<\/dfs.namenode.heapsize.mb>/g;\
 s/<dfs.datanode.heapsize.mb>.*<\/dfs.datanode.heapsize.mb>/<dfs.datanode.heapsize.mb>$heap_memory_mb<\/dfs.datanode.heapsize.mb>/g;\
 s/<yarn.resourcemanager.heapsize.mb>.*<\/yarn.resourcemanager.heapsize.mb>/<yarn.resourcemanager.heapsize.mb>$heap_memory_mb<\/yarn.resourcemanager.heapsize.mb>/g;\
@@ -137,10 +138,13 @@ s/<yarn.nodemanager.heapsize.mb>.*<\/yarn.nodemanager.heapsize.mb>/<yarn.nodeman
 s/<hbase.heapsize.mb>.*<\/hbase.heapsize.mb>/<hbase.heapsize.mb>$heap_memory_mb<\/hbase.heapsize.mb>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
 
 sed -i "s/<\/configuration>/\
-\n<property>\
-\n    <name>dfs.replication<\/name>\
-\n    <value>$HDFS_REPLICATION_FACTOR<\/value>\
-\n<\/property>\
+\n<property>\n  <name>mapreduce.map.memory.mb<\/name>\n  <value>$nm_resource_memory_mb_90_percent<\/value>\n<\/property>\
+\n<property>\n  <name>mapreduce.reduce.memory.mb<\/name>\n  <value>$nm_resource_memory_mb_90_percent<\/value>\n<\/property>\
+\n<property>\n  <name>yarn.app.mapreduce.am.resource.mb<\/name>\n  <value>$nm_resource_memory_mb<\/value>\n<\/property>\
+\n<\/configuration> /g;" /home/gpadmin/ClusterConfigDir/yarn/mapred-site.xml 
+
+sed -i "s/<\/configuration>/\
+\n<property>\n    <name>dfs.replication<\/name>\n    <value>$HDFS_REPLICATION_FACTOR<\/value>\n<\/property>\
 \n<\/configuration> /g;" /home/gpadmin/ClusterConfigDir/hdfs/hdfs-site.xml
 
 # Configuration per service
