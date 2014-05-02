@@ -6,6 +6,7 @@
 *.log.*
 *.sig
 *.rpm
+*.gz
 pkg/
 src/
 .vagrant/
