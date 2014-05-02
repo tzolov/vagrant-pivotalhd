@@ -32,7 +32,7 @@ WORKERS = ["phd2.localdomain", "phd3.localdomain"]
 # Community PivotalHD 1.1.0
 PHD_110_HAWQ_GFXD = ["tar.gz", "PCC-2.1.0-460", "PHD-1.1.0.0-76", "PADS-1.1.3-31", "PRTS-1.0.0-8"]
 # PivotalHD 1.1.1 distribution
-PHD_111_HAWQ_GFXD = ["tar.gz", "PCC-2.1.1-73", "PHD-1.1.1.0-82", "PADS-1.1.4-34", "PRTS-1.0.0-9"]
+PHD_111_HAWQ = ["gz", "PCC-2.1.1-73", "PHD-1.1.1.0-82", "PADS-1.1.4-34", "N/A"]
 # PivotalHD 2.0.1 distribution
 PHD_201_LATEST_HAWQ_GFXD = ["gz", "PCC-2.2.1-150", "PHD-2.0.1.0-148", "PADS-1.2.0.1-8119", "PRTS-1.0.0-14"]	
 
