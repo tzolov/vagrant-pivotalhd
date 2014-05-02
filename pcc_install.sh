@@ -13,17 +13,19 @@
 
 JAVA_RPM_PATH=$1
 
-# Pivotal Control Center (PCC) package name ({PCC_PACKAGE_NAME}.x86_64.tar.gz)
-PCC_PACKAGE_NAME=$2
+PACKAGE_EXTENSION=$2
 
-# Pivotal HD (PHD) package name ({PHD_PACKAGE_NAME}.tar.gz)
-PHD_PACKAGE_NAME=$3
+# Pivotal Control Center (PCC) package name ({PCC_PACKAGE_NAME}.x86_64.{PACKAGE_EXTENSION})
+PCC_PACKAGE_NAME=$3
 
-# HAWQ - Pivotal Advanced Data Service (PADS) package name ({PADS_PACKAGE_NAME}.tar.gz)
-PADS_PACKAGE_NAME=$4
+# Pivotal HD (PHD) package name ({PHD_PACKAGE_NAME}.{PACKAGE_EXTENSION})
+PHD_PACKAGE_NAME=$4
 
-# GemfireXD - Pivotal Real-Time Service (PRTS) package name ({PRTS_PACKAGE_NAME}.tar.gz)
-PRTS_PACKAGE_NAME=$5
+# HAWQ - Pivotal Advanced Data Service (PADS) package name ({PADS_PACKAGE_NAME}.{PACKAGE_EXTENSION})
+PADS_PACKAGE_NAME=$5
+
+# GemfireXD - Pivotal Real-Time Service (PRTS) package name ({PRTS_PACKAGE_NAME}.{PACKAGE_EXTENSION})
+PRTS_PACKAGE_NAME=$6
        
 # Empty or 'NA' stands for undefined package.
 is_package_defined() {
@@ -49,15 +51,15 @@ fi
  
 # Ensure that all installation packages are available in the same folder where  the 'vagrant up' is executed.
 [ ! -f $JAVA_RPM_PATH ] && ( echo "Can not find jdk-7u45-linux-x64.rpm in the vagrant startup directory"; exit 1 )
-[ ! -f /vagrant/$PCC_PACKAGE_NAME.x86_64.tar.gz ] && ( echo "Can not find $PCC_PACKAGE_NAME.x86_64.tar.gz in the vagrant startup directory"; exit 1 )
-[ ! -f /vagrant/$PHD_PACKAGE_NAME.tar.gz ] && ( echo "Can not find $PHD_PACKAGE_NAME.tar.gz in the vagrant startup directory"; exit 1 )
+[ ! -f /vagrant/$PCC_PACKAGE_NAME.x86_64.$PACKAGE_EXTENSION ] && ( echo "Can not find $PCC_PACKAGE_NAME.x86_64.$PACKAGE_EXTENSION in the vagrant startup directory"; exit 1 )
+[ ! -f /vagrant/$PHD_PACKAGE_NAME.$PACKAGE_EXTENSION ] && ( echo "Can not find $PHD_PACKAGE_NAME.$PACKAGE_EXTENSION in the vagrant startup directory"; exit 1 )
 
 if (is_package_defined $PADS_PACKAGE_NAME); then
-   [ ! -f /vagrant/$PADS_PACKAGE_NAME.tar.gz ] && ( echo "Can not find $PADS_PACKAGE_NAME.tar.gz in the vagrant startup directory"; exit 1 )
+   [ ! -f /vagrant/$PADS_PACKAGE_NAME.$PACKAGE_EXTENSION ] && ( echo "Can not find $PADS_PACKAGE_NAME.$PACKAGE_EXTENSION in the vagrant startup directory"; exit 1 )
 fi
 
 if (is_package_defined $PRTS_PACKAGE_NAME); then
-   [ ! -f /vagrant/$PRTS_PACKAGE_NAME.tar.gz ] && ( echo "Can not find $PRTS_PACKAGE_NAME.tar.gz in the vagrant startup directory"; exit 1 )
+   [ ! -f /vagrant/$PRTS_PACKAGE_NAME.$PACKAGE_EXTENSION ] && ( echo "Can not find $PRTS_PACKAGE_NAME.$PACKAGE_EXTENSION in the vagrant startup directory"; exit 1 )
 fi
  
 # Disable security.
@@ -73,7 +75,7 @@ echo "**************************************************************************
 service commander stop
  
 # Copy, uncompress and enter the PCC package folder
-tar --no-same-owner -xzvf /vagrant/$PCC_PACKAGE_NAME.x86_64.tar.gz --directory /home/vagrant/; cd /home/vagrant/$PCC_PACKAGE_NAME
+tar --no-same-owner -xzvf /vagrant/$PCC_PACKAGE_NAME.x86_64.$PACKAGE_EXTENSION --directory /home/vagrant/; cd /home/vagrant/$PCC_PACKAGE_NAME
 
 # Pre-patch before icm is run
 sudo sed -i "s/service commander start/sed -i \'s\/gphdmgr.statusfetch.interval.secs=10\/gphdmgr.statusfetch.interval.secs=30\/g\' \/etc\/gphd\/gphdmgr\/conf\/gphdmgr.properties; \n& service commander start/g " /home/vagrant/$PCC_PACKAGE_NAME/support/install_script 
@@ -94,19 +96,16 @@ echo "**************************************************************************
 echo "Import PHD & PADS packages into the PCC local yum repository ..."
  
 # (Required) For installing PHD
-su - -c "tar -xzf /vagrant/$PHD_PACKAGE_NAME.tar.gz --directory ~; icm_client import -s ./$PHD_PACKAGE_NAME" gpadmin
+su - -c "tar -xzf /vagrant/$PHD_PACKAGE_NAME.$PACKAGE_EXTENSION --directory ~; icm_client import -s ./$PHD_PACKAGE_NAME" gpadmin
  
 if (is_package_defined $PADS_PACKAGE_NAME); then
-  su - -c "tar -xzf /vagrant/$PADS_PACKAGE_NAME.tar.gz --directory ~; icm_client import -s ./$PADS_PACKAGE_NAME" gpadmin
+  su - -c "tar -xzf /vagrant/$PADS_PACKAGE_NAME.$PACKAGE_EXTENSION --directory ~; icm_client import -s ./$PADS_PACKAGE_NAME" gpadmin
 fi
  
 if (is_package_defined $PRTS_PACKAGE_NAME); then
-  su - -c "tar -xzf /vagrant/$PRTS_PACKAGE_NAME.tar.gz --directory ~; icm_client import -s ./$PRTS_PACKAGE_NAME" gpadmin
+  su - -c "tar -xzf /vagrant/$PRTS_PACKAGE_NAME.$PACKAGE_EXTENSION --directory ~; icm_client import -s ./$PRTS_PACKAGE_NAME" gpadmin
 fi
- 
-# (Optional) Import DataLoader and UUS installation packages
-#su - -c "tar -xzf /vagrant/PHDTools-1.1.0.0-97.tar.gz --directory ~; icm_client import -p ./PHDTools-1.1.0.0-97" gpadmin
-  
+   
 # Import Java 7 packages in the local yum repo
 su - -c "icm_client import -r $JAVA_RPM_PATH" gpadmin
 
