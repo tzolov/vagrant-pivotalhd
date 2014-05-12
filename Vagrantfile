@@ -11,6 +11,7 @@ CLUSTER_NAME = "phd-c1"
 
 # List of services to deploy. Note: hdfs,yarn and zookeeper services are compulsory! 
 SERVICES = ["hdfs", "yarn", "hive", "pig", "zookeeper", "hbase", "gpxf", "hawq", "gfxd", "graphlab", "oozie", "hue", "sqoop"]
+# SERVICES = ["hdfs", "yarn", "hive", "pig", "zookeeper", "hbase", "spark"]
 
 # Node(s) to be used as a master. Convention is: 'phd<Number>.localdomain'. Exactly One master node must be provided
 MASTER = ["phd1.localdomain"]

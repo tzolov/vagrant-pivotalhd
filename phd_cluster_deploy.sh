@@ -16,6 +16,7 @@ source /vagrant/provision/sqoop_service.sh
 source /vagrant/provision/graphlab_service.sh
 source /vagrant/provision/gfxd_service.sh
 source /vagrant/provision/hawq_service.sh
+source /vagrant/provision/spark_service.sh
 
 [ "$#" -ne 7 ] && (echo "Expects 7 input agreements but found: $#"; exit 1)
   
@@ -106,7 +107,7 @@ su - -c "icm_client fetch-template -o ~/ClusterConfigDir" gpadmin
 # Apply the mapping convention (above) to the default clusterConfig.xml.
 
 # remove services not supported by the clusterConfig.xml
-SUPPORTED_SERVICES=$SERVICES; for non_icm_service in 'graphlab' 'oozie' 'hue' 'sqoop'; do SUPPORTED_SERVICES=${SUPPORTED_SERVICES/,$non_icm_service}; done
+SUPPORTED_SERVICES=$SERVICES; for non_icm_service in 'graphlab' 'oozie' 'hue' 'sqoop' 'spark'; do SUPPORTED_SERVICES=${SUPPORTED_SERVICES/,$non_icm_service}; done
 
 sed -i "\
 s/<clusterName>.*<\/clusterName>/<clusterName>$CLUSTER_NAME<\/clusterName>/g;\
@@ -273,4 +274,9 @@ fi
 if (is_service_enabled "sqoop"); then
     # Arguments: SQOOP_CLIENT, SQOO_METASTORE, ROOT_PASSWORD
     sqoop_post_cluster_start $MASTER_NODE $MASTER_NODE $ROOT_PASSWORD
+fi
+
+if (is_service_enabled "spark"); then
+    # Arguments: SPARK_MASTER
+    spark_post_cluster_start $MASTER_NODE
 fi

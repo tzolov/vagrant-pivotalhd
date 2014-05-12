@@ -11,4 +11,5 @@ pkg/
 src/
 .vagrant/
 .DS_Store
-
+pivotal-samples/
+retail_demo/
