@@ -7,10 +7,10 @@ VAGRANTFILE_API_VERSION = "2"
 require 'set'
 
 # PivotalHD cluster name
-CLUSTER_NAME = "phd-c1"
+CLUSTER_NAME = "phdc1"
 
 # List of services to deploy. Note: hdfs,yarn and zookeeper services are compulsory! 
-SERVICES = ["hdfs", "yarn", "hive", "pig", "zookeeper", "hbase", "gpxf", "hawq", "gfxd", "graphlab"]
+SERVICES = ["hdfs", "yarn", "hive", "pig", "zookeeper", "hbase", "pxf", "hawq", "gfxd", "graphlab"]
 
 # Node(s) to be used as a master. Convention is: 'phd<Number>.localdomain'. Exactly One master node must be provided
 MASTER = ["phd1.localdomain"]
@@ -35,9 +35,11 @@ PHD_110 = ["tar.gz", "PCC-2.1.0-460", "PHD-1.1.0.0-76", "PADS-1.1.3-31", "PRTS-1
 PHD_111 = ["gz", "PCC-2.1.1-73", "PHD-1.1.1.0-82", "PADS-1.1.4-34", "NA"]
 # PivotalHD 2.0.1 distribution
 PHD_201 = ["gz", "PCC-2.2.1-150", "PHD-2.0.1.0-148", "PADS-1.2.0.1-8119", "PRTS-1.0.0-14"]	
+PHD_210 = ["tar.gz", "PCC-2.3.0-443", "PHD-2.1.0.0-175", "PADS-1.2.1.0-10335", "PRTS-1.3.0-48613"]
+
 
 # Set the distribution to install
-PHD_DISTRIBUTION_TO_INSTALL = PHD_201
+PHD_DISTRIBUTION_TO_INSTALL = PHD_210
 
 # JDK to be installed
 JAVA_RPM_PATH = "/vagrant/jdk-7u45-linux-x64.rpm"
@@ -55,7 +57,7 @@ MASTER_PHD_MEMORY_MB = "2048"
 WORKER_PHD_MEMORY_MB = "2048"
 
 # Memory (MB) allocated for the PCC VM
-PCC_MEMORY_MB = "768"
+PCC_MEMORY_MB = "1024"
 
 # If set to FALSE it will install only PCC
 DEPLOY_PHD_CLUSTER = TRUE
@@ -140,7 +142,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
      pcc.vm.provision "shell" do |s|
        s.path = "phd_cluster_deploy.sh"
-       s.args = [CLUSTER_NAME, SERVICES.uniq.join(","), MASTER.uniq.join(","), WORKERS.uniq.join(","), WORKER_PHD_MEMORY_MB, JAVA_RPM_PATH, HDFS_REPLICATION_FACTOR]
+       s.args = [CLUSTER_NAME, SERVICES.uniq.join(","), MASTER.uniq.join(","), WORKERS.uniq.join(","), WORKER_PHD_MEMORY_MB, JAVA_RPM_PATH, HDFS_REPLICATION_FACTOR, WORKERS.uniq.last]
      end 
    end
    

@@ -37,6 +37,8 @@ JAVA_RPM_PATH=$6
 
 # HDFS replication factor - relative to the number of DataNodes
 HDFS_REPLICATION_FACTOR=$7 
+
+SECOND_MASTER_NODE=$8 
  
 # By default the HAWQ master is collocated with the other master services.
 HAWQ_MASTER=$MASTER_NODE
@@ -105,12 +107,14 @@ su - -c "icm_client fetch-template -o ~/ClusterConfigDir" gpadmin
 SUPPORTED_SERVICES=${SERVICES/,graphlab/}
 
 sed -i "\
+s/<securityEnabled>true<\/securityEnabled>/<securityEnabled>false<\/securityEnabled>/g;\
 s/<clusterName>.*<\/clusterName>/<clusterName>$CLUSTER_NAME<\/clusterName>/g;\
 s/<services>.*<\/services>/<services>$SUPPORTED_SERVICES<\/services>/g;\
 s/<client>.*<\/client>/<client>$CLIENT_NODE<\/client>/g;\
 s/<namenode>.*<\/namenode>/<namenode>$MASTER_NODE<\/namenode>/g;\
 s/<datanode>.*<\/datanode>/<datanode>$WORKER_NODES<\/datanode>/g;\
-s/<secondarynamenode>.*<\/secondarynamenode>/<secondarynamenode>$MASTER_NODE<\/secondarynamenode>/g;\
+s/<standbynamenode>.*<\/standbynamenode>/<standbynamenode>$SECOND_MASTER_NODE<\/standbynamenode>/g;\
+s/<journalnode>.*<\/journalnode>/<journalnode>$WORKER_NODES<\/journalnode>/g;\
 s/<yarn-resourcemanager>.*<\/yarn-resourcemanager>/<yarn-resourcemanager>$MASTER_NODE<\/yarn-resourcemanager>/g;\
 s/<yarn-nodemanager>.*<\/yarn-nodemanager>/<yarn-nodemanager>$WORKER_NODES<\/yarn-nodemanager>/g;\
 s/<mapreduce-historyserver>.*<\/mapreduce-historyserver>/<mapreduce-historyserver>$MASTER_NODE<\/mapreduce-historyserver>/g;\
@@ -162,7 +166,13 @@ s/<hawq-standbymaster>.*<\/hawq-standbymaster>/<hawq-standbymaster>$HAWQ_MASTER<
 s/<hawq-segment>.*<\/hawq-segment>/<hawq-segment>$HAWQ_SEGMENT_HOSTS<\/hawq-segment>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
 fi
 
+if (is_service_enabled "pxf"); then
+sed -i "\
+s/<pxf-service>.*<\/pxf-service>/<pxf-service>$HAWQ_MASTER,$WORKER_NODES<\/pxf-service>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
+fi
+
 if (is_service_enabled "gfxd"); then
+if (! grep -q "gfxd-locator" "/home/gpadmin/ClusterConfigDir/clusterConfig.xml"); then
 sed -i "\
 s/<\/hostRoleMapping>/\
 \n         <gfxd>\
@@ -171,7 +181,10 @@ s/<\/hostRoleMapping>/\
 \n         <\/gfxd>\
 \n     <\/hostRoleMapping>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
 fi
- 
+sed -i "\
+s/<gfxd-locator>.*<\/gfxd-locator>/<gfxd-locator>$GFXD_LOCATOR<\/gfxd-locator>/g;\
+s/<gfxd-server>.*<\/gfxd-server>/<gfxd-server>$GFXD_SERVERS<\/gfxd-server>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
+fi 
 xmlwf /home/gpadmin/ClusterConfigDir/clusterConfig.xml  
  
 # Set vm.overcommit_memory to 1 to prevent OOM and other VM issues. 

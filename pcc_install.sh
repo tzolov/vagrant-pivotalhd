@@ -78,7 +78,11 @@ service commander stop
 tar --no-same-owner -xzvf /vagrant/$PCC_PACKAGE_NAME.x86_64.$PACKAGE_EXTENSION --directory /home/vagrant/; cd /home/vagrant/$PCC_PACKAGE_NAME
 
 # Pre-patch before icm is run
-sudo sed -i "s/service commander start/sed -i \'s\/gphdmgr.statusfetch.interval.secs=10\/gphdmgr.statusfetch.interval.secs=30\/g\' \/etc\/gphd\/gphdmgr\/conf\/gphdmgr.properties; \n& service commander start/g " /home/vagrant/$PCC_PACKAGE_NAME/support/install_script 
+#Fix jetty memory settings (2G -> 0.5G)
+sudo sed -i "s/service commander start/sed -i \'s\/gphdmgr.statusfetch.interval.secs=10\/gphdmgr.statusfetch.interval.secs=30\/g\' \/etc\/gphd\/gphdmgr\/conf\/gphdmgr.properties; sed -i \'s\/-Xmx2048m\/-Xmx512m\/g\' \/usr\/lib\/gphd\/gphdmgr\/bin\/setenv.sh ; service commander start/g" /home/vagrant/$PCC_PACKAGE_NAME/support/install_script 
+
+# Use default settings (e.g. gpadmin home dir ...)
+sed -i 's/prompt_until_valid/#prompt_until_valid/g' /home/vagrant/$PCC_PACKAGE_NAME/support/install_script 
  
 # Install PCC as root using root's login shell (Note: will not work without the '-' option)
 su - -c "cd /home/vagrant/$PCC_PACKAGE_NAME; ./install" root
@@ -86,6 +90,7 @@ su - -c "cd /home/vagrant/$PCC_PACKAGE_NAME; ./install" root
 # Fix a known ICM bug (fix has to e applied before installing the cluster!)
 sed -i $'s/\"INSTALL_UNKNOWN\" + \"\x01\"/\"INSTALL_UNKNOWN\" + \"\x01\" + \"\" + \"\x03\"/g' /usr/lib/gphd/gphdmgr/lib/server/StatusFetcher.py
 sed -i 's/gphdmgr.statusfetch.interval.secs=10/gphdmgr.statusfetch.interval.secs=30/g' /etc/gphd/gphdmgr/conf/gphdmgr.properties
+
 # Uncomment if you see the 'phd-c1 Status: install_failed' message during deployment
 # service commander restart
  
