@@ -35,7 +35,7 @@ PHD_110 = ["tar.gz", "PCC-2.1.0-460", "PHD-1.1.0.0-76", "PADS-1.1.3-31", "PRTS-1
 PHD_111 = ["gz", "PCC-2.1.1-73", "PHD-1.1.1.0-82", "PADS-1.1.4-34", "NA"]
 # PivotalHD 2.0.1 distribution
 PHD_201 = ["gz", "PCC-2.2.1-150", "PHD-2.0.1.0-148", "PADS-1.2.0.1-8119", "PRTS-1.0.0-14"]	
-PHD_210 = ["tar.gz", "PCC-2.3.0-443", "PHD-2.1.0.0-175", "PADS-1.2.1.0-10335", "PRTS-1.3.0-48613"]
+PHD_210 = ["tar.gz", "PCC-2.3.0-443", "PHD-2.1.0.0-175", "PADS-1.2.1.0-10335", "PRTS-1.3.1-49833"]
 
 
 # Set the distribution to install

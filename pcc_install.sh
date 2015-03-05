@@ -79,7 +79,7 @@ tar --no-same-owner -xzvf /vagrant/$PCC_PACKAGE_NAME.x86_64.$PACKAGE_EXTENSION -
 
 # Pre-patch before icm is run
 #Fix jetty memory settings (2G -> 0.5G)
-sudo sed -i "s/service commander start/sed -i \'s\/gphdmgr.statusfetch.interval.secs=10\/gphdmgr.statusfetch.interval.secs=30\/g\' \/etc\/gphd\/gphdmgr\/conf\/gphdmgr.properties; sed -i \'s\/-Xmx2048m\/-Xmx512m\/g\' \/usr\/lib\/gphd\/gphdmgr\/bin\/setenv.sh ; service commander start/g" /home/vagrant/$PCC_PACKAGE_NAME/support/install_script 
+sudo sed -i "s/service commander start/sed -i \'s\/PRTS-1.3.0 PRTS-1.3\/PRTS-1.3.0 PRTS-1.3.1 PRTS-1.3\/g\' \/etc\/gphd\/gphdmgr\/conf\/compatibleStack.properties; sed -i \'s\/gphdmgr.statusfetch.interval.secs=10\/gphdmgr.statusfetch.interval.secs=30\/g\' \/etc\/gphd\/gphdmgr\/conf\/gphdmgr.properties; sed -i \'s\/-Xmx2048m\/-Xmx512m\/g\' \/usr\/lib\/gphd\/gphdmgr\/bin\/setenv.sh ; service commander start/g" /home/vagrant/$PCC_PACKAGE_NAME/support/install_script 
 
 # Use default settings (e.g. gpadmin home dir ...)
 sed -i 's/prompt_until_valid/#prompt_until_valid/g' /home/vagrant/$PCC_PACKAGE_NAME/support/install_script 

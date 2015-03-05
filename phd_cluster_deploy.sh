@@ -12,6 +12,12 @@
 
 
 [ "$#" -ne 7 ] && (echo "Expects 7 input agreements but found: $#"; exit 1)
+
+# Number of cores per node
+VCORES_PER_NODE=1
+
+# Number of local discs per node
+DISKS_PER_NODE=3
   
 # Sets the cluster name to be used in PCC (Pivotal Control Center)
 CLUSTER_NAME=$1
@@ -74,6 +80,25 @@ is_service_enabled() {
 	fi	
 }
 
+min() {
+	if (( $1 < $2 ))
+	then
+		echo $1
+	else
+		echo $2
+	fi
+}
+
+max() {
+	if (( $1 > $2 ))
+	then
+		echo $1
+	else
+		echo $2
+	fi
+}
+
+
 echo "********************************************************************************"
 echo "********************************************************************************"
 echo "*                 Pre-Deploy Cluster: $CLUSTER_NAME                    "
@@ -122,15 +147,27 @@ s/<zookeeper-server>.*<\/zookeeper-server>/<zookeeper-server>$WORKER_NODES<\/zoo
 #s/<zookeeper-server>.*<\/zookeeper-server>/<zookeeper-server>$MASTER_NODE<\/zookeeper-server>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
 
 # Configure the YARN and Heap memory relative to the available VM memory size
-nm_resource_memory_mb=$(((PHD_MEMORY_MB / 100) * 95))
-scheduler_min_allocation_mb=$(((PHD_MEMORY_MB / 100) * 60))
-nm_resource_memory_mb_90_percent=$(((PHD_MEMORY_MB / 100) * 90))
-yarn_scheduler_minimum_allocation_mb=$(($nm_resource_memory_mb_90_percent<1024?$nm_resource_memory_mb_90_percent:1024))
-heap_memory_mb=$(($nm_resource_memory_mb_90_percent<2048?$nm_resource_memory_mb_90_percent:2048))
+
+total_yarn_ram_mb=$((PHD_MEMORY_MB<4096?PHD_MEMORY_MB - 128:PHD_MEMORY_MB - 512))
+min_container_ram_mb=$((PHD_MEMORY_MB<4096?256:512))
+containers_per_node=$(( $(min $(min $((2 * VCORES_PER_NODE)) $(( (18 * DISKS_PER_NODE)/10))) $(($total_yarn_ram_mb/$min_container_ram_mb)) ) ))
+ram_per_container=$(max $min_container_ram_mb $(($total_yarn_ram_mb / $containers_per_node)) )
+
+yarn_nodemanager_resource_memory_mb=$(($containers_per_node * $ram_per_container))
+yarn_scheduler_minimum_allocation_mb=$ram_per_container
+yarn_scheduler_maximum_allocation_mb=$yarn_nodemanager_resource_memory_mb
+mapreduce_map_memory_mb=$ram_per_container
+mapreduce_reduce_memory_mb=$(( 2 * $ram_per_container ))
+mapreduce_map_java_opts=$(( (8 * $ram_per_container)/10 ))
+mapreduce_reduce_java_opts=$(( (8 * 2 * $ram_per_container)/10 ))
+yarn_app_mapreduce_am_resource_mb=$((2 * $ram_per_container))
+yarn_app_mapreduce_am_command_opts=$(( (8 * $yarn_app_mapreduce_am_resource_mb)/10 ))
+
+heap_memory_mb=$yarn_nodemanager_resource_memory_mb
 
 sed -i "\
-s/<yarn.nodemanager.resource.memory-mb>.*<\/yarn.nodemanager.resource.memory-mb>/<yarn.nodemanager.resource.memory-mb>$nm_resource_memory_mb<\/yarn.nodemanager.resource.memory-mb>/g;\
-s/<yarn.scheduler.minimum-allocation-mb>.*<\/yarn.scheduler.minimum-allocation-mb>/<yarn.scheduler.minimum-allocation-mb>$scheduler_min_allocation_mb<\/yarn.scheduler.minimum-allocation-mb>/g;\
+s/<yarn.nodemanager.resource.memory-mb>.*<\/yarn.nodemanager.resource.memory-mb>/<yarn.nodemanager.resource.memory-mb>$total_yarn_ram_mb<\/yarn.nodemanager.resource.memory-mb>/g;\
+s/<yarn.scheduler.minimum-allocation-mb>.*<\/yarn.scheduler.minimum-allocation-mb>/<yarn.scheduler.minimum-allocation-mb>$yarn_scheduler_minimum_allocation_mb<\/yarn.scheduler.minimum-allocation-mb>/g;\
 s/<dfs.namenode.heapsize.mb>.*<\/dfs.namenode.heapsize.mb>/<dfs.namenode.heapsize.mb>$heap_memory_mb<\/dfs.namenode.heapsize.mb>/g;\
 s/<dfs.datanode.heapsize.mb>.*<\/dfs.datanode.heapsize.mb>/<dfs.datanode.heapsize.mb>$heap_memory_mb<\/dfs.datanode.heapsize.mb>/g;\
 s/<yarn.resourcemanager.heapsize.mb>.*<\/yarn.resourcemanager.heapsize.mb>/<yarn.resourcemanager.heapsize.mb>$heap_memory_mb<\/yarn.resourcemanager.heapsize.mb>/g;\
@@ -138,9 +175,9 @@ s/<yarn.nodemanager.heapsize.mb>.*<\/yarn.nodemanager.heapsize.mb>/<yarn.nodeman
 s/<hbase.heapsize.mb>.*<\/hbase.heapsize.mb>/<hbase.heapsize.mb>$heap_memory_mb<\/hbase.heapsize.mb>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
 
 sed -i "s/<\/configuration>/\
-\n<property>\n  <name>mapreduce.map.memory.mb<\/name>\n  <value>$nm_resource_memory_mb_90_percent<\/value>\n<\/property>\
-\n<property>\n  <name>mapreduce.reduce.memory.mb<\/name>\n  <value>$nm_resource_memory_mb_90_percent<\/value>\n<\/property>\
-\n<property>\n  <name>yarn.app.mapreduce.am.resource.mb<\/name>\n  <value>$nm_resource_memory_mb<\/value>\n<\/property>\
+\n<property>\n  <name>mapreduce.map.memory.mb<\/name>\n  <value>$mapreduce_map_memory_mb<\/value>\n<\/property>\
+\n<property>\n  <name>mapreduce.reduce.memory.mb<\/name>\n  <value>$mapreduce_reduce_memory_mb<\/value>\n<\/property>\
+\n<property>\n  <name>yarn.app.mapreduce.am.resource.mb<\/name>\n  <value>$yarn_app_mapreduce_am_resource_mb<\/value>\n<\/property>\
 \n<\/configuration> /g;" /home/gpadmin/ClusterConfigDir/yarn/mapred-site.xml 
 
 sed -i "s/<\/configuration>/\
