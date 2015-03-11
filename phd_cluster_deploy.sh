@@ -206,6 +206,7 @@ fi
 if (is_service_enabled "pxf"); then
 sed -i "\
 s/<pxf-service>.*<\/pxf-service>/<pxf-service>$HAWQ_MASTER,$WORKER_NODES<\/pxf-service>/g;" /home/gpadmin/ClusterConfigDir/clusterConfig.xml
+echo '/usr/lib/gphd/gfxd/lib/gemfirexd.jar' >> /home/gpadmin/ClusterConfigDir/pxf/pxf-public.classpath
 fi
 
 if (is_service_enabled "gfxd"); then
