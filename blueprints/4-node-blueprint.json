@@ -1,0 +1,290 @@
+{
+  "configurations" : [    
+    {
+      "nagios-env": {
+        "nagios_contact": "admin@localhost.com"
+      }
+    },
+    {
+      "hawq-site" : {
+        "hawq.cluster.name" : "HAWQ",
+        "hawq.data.directory" : "/data/hawq/segments",
+        "hawq.master.directory" : "/data/hawq/master",
+        "hawq.master.keytab.file" : "/etc/security/keytabs/hawq.service.keytab",
+        "hawq.master.port" : "5432",
+        "hawq.segment.base.port" : "40000",
+        "hawq.segments.per.node" : "4",
+        "hawq.temp.directory" : " ",
+        "hawq.user.password" : "gpadmin",
+        "set.os.parameters" : "true",
+        "skip.preinstall.verification" : "true"
+      }
+    }
+  ],
+  "host_groups" : [
+    {
+      "name" : "host_group_2",
+      "configurations" : [ ],
+      "components" : [
+        {
+          "name" : "ZOOKEEPER_CLIENT"
+        },
+        {
+          "name" : "PIG"
+        },
+        {
+          "name" : "OOZIE_CLIENT"
+        },
+        {
+          "name" : "HBASE_REGIONSERVER"
+        },
+        {
+          "name" : "HBASE_CLIENT"
+        },
+        {
+          "name" : "NAMENODE"
+        },
+        {
+          "name" : "HIVE_SERVER"
+        },
+        {
+          "name" : "HCAT"
+        },
+        {
+          "name" : "TEZ_CLIENT"
+        },
+        {
+          "name" : "PXF"
+        },
+        {
+          "name" : "HIVE_METASTORE"
+        },
+        {
+          "name" : "HAWQSEGMENT"
+        },
+        {
+          "name" : "NODEMANAGER"
+        },
+        {
+          "name" : "HDFS_CLIENT"
+        },
+        {
+          "name" : "HIVE_CLIENT"
+        },
+        {
+          "name" : "YARN_CLIENT"
+        },
+        {
+          "name" : "MAPREDUCE2_CLIENT"
+        },
+        {
+          "name" : "DATANODE"
+        },
+        {
+          "name" : "MYSQL_SERVER"
+        },
+        {
+          "name" : "GANGLIA_MONITOR"
+        },
+        {
+          "name" : "WEBHCAT_SERVER"
+        },
+        {
+          "name" : "RESOURCEMANAGER"
+        }
+      ],
+      "cardinality" : "1"
+    },
+    {
+      "name" : "host_group_1",
+      "configurations" : [ ],
+      "components" : [
+        {
+          "name" : "ZOOKEEPER_CLIENT"
+        },
+        {
+          "name" : "PIG"
+        },
+        {
+          "name" : "OOZIE_CLIENT"
+        },
+        {
+          "name" : "HBASE_CLIENT"
+        },
+        {
+          "name" : "HCAT"
+        },
+        {
+          "name" : "KNOX_GATEWAY"
+        },
+        {
+          "name" : "NAGIOS_SERVER"
+        },
+        {
+          "name" : "TEZ_CLIENT"
+        },
+        {
+          "name" : "AMBARI_SERVER"
+        },
+        {
+          "name" : "GANGLIA_SERVER"
+        },
+        {
+          "name" : "HDFS_CLIENT"
+        },
+        {
+          "name" : "HIVE_CLIENT"
+        },
+        {
+          "name" : "YARN_CLIENT"
+        },
+        {
+          "name" : "MAPREDUCE2_CLIENT"
+        },
+        {
+          "name" : "GANGLIA_MONITOR"
+        }
+      ],
+      "cardinality" : "1"
+    },
+    {
+      "name" : "host_group_3",
+      "configurations" : [ ],
+      "components" : [
+        {
+          "name" : "ZOOKEEPER_CLIENT"
+        },
+        {
+          "name" : "PIG"
+        },
+        {
+          "name" : "HISTORYSERVER"
+        },
+        {
+          "name" : "OOZIE_CLIENT"
+        },
+        {
+          "name" : "HBASE_REGIONSERVER"
+        },
+        {
+          "name" : "HBASE_CLIENT"
+        },
+        {
+          "name" : "HBASE_MASTER"
+        },
+        {
+          "name" : "HCAT"
+        },
+        {
+          "name" : "TEZ_CLIENT"
+        },
+        {
+          "name" : "PXF"
+        },
+        {
+          "name" : "APP_TIMELINE_SERVER"
+        },
+        {
+          "name" : "HAWQSEGMENT"
+        },
+        {
+          "name" : "NODEMANAGER"
+        },
+        {
+          "name" : "HDFS_CLIENT"
+        },
+        {
+          "name" : "HIVE_CLIENT"
+        },
+        {
+          "name" : "YARN_CLIENT"
+        },
+        {
+          "name" : "MAPREDUCE2_CLIENT"
+        },
+        {
+          "name" : "DATANODE"
+        },
+        {
+          "name" : "GANGLIA_MONITOR"
+        },
+        {
+          "name" : "HAWQSTANDBY"
+        }
+      ],
+      "cardinality" : "1"
+    },
+    {
+      "name" : "host_group_4",
+      "configurations" : [ ],
+      "components" : [
+        {
+          "name" : "ZOOKEEPER_SERVER"
+        },
+        {
+          "name" : "ZOOKEEPER_CLIENT"
+        },
+        {
+          "name" : "PIG"
+        },
+        {
+          "name" : "HBASE_REGIONSERVER"
+        },
+        {
+          "name" : "OOZIE_CLIENT"
+        },
+        {
+          "name" : "HBASE_CLIENT"
+        },
+        {
+          "name" : "OOZIE_SERVER"
+        },
+        {
+          "name" : "HCAT"
+        },
+        {
+          "name" : "SECONDARY_NAMENODE"
+        },
+        {
+          "name" : "TEZ_CLIENT"
+        },
+        {
+          "name" : "PXF"
+        },
+        {
+          "name" : "HAWQSEGMENT"
+        },
+        {
+          "name" : "HDFS_CLIENT"
+        },
+        {
+          "name" : "HIVE_CLIENT"
+        },
+        {
+          "name" : "NODEMANAGER"
+        },
+        {
+          "name" : "YARN_CLIENT"
+        },
+        {
+          "name" : "MAPREDUCE2_CLIENT"
+        },
+        {
+          "name" : "DATANODE"
+        },
+        {
+          "name" : "HAWQMASTER"
+        },
+        {
+          "name" : "GANGLIA_MONITOR"
+        }
+      ],
+      "cardinality" : "1"
+    }
+  ],
+  "Blueprints" : {
+    "stack_name" : "PHD",
+    "stack_version" : "3.0",
+    "blueprint_name": "4-node-blueprint"
+  }
+}
