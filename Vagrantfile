@@ -105,13 +105,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
      s.args = NUMBER_OF_CLUSTER_NODES
    end
 
+   # Fix hostname FQDN
+   ambari.vm.provision :shell, :inline => "hostname ambari.localdomain"
+
    # Install Ambari 
    ambari.vm.provision "shell" do |s|
      s.path = "scripts/start_cluster.sh"
 	 s.args = "4-node-blueprint"
    end 
    
-   # Fix hostname FQDN
-   ambari.vm.provision :shell, :inline => "hostname ambari.localdomain"	     
   end
 end

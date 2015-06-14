@@ -61,7 +61,8 @@ ambari-server start
 cp /vagrant/id_dsa.pub /home/vagrant/.ssh/
 cp /vagrant/id_dsa /home/vagrant/.ssh/
 chown vagrant:vagrant /home/vagrant/.ssh/id_dsa*
-cat /vagrant/id_rsa.pub | cat >> ~/.ssh/authorized_keys
+chmod 400 /home/vagrant/.ssh/id_dsa
+cat /vagrant/id_dsa.pub | cat >> ~/.ssh/authorized_keys
 
 # Install python-pip and python's requests
 rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm      
