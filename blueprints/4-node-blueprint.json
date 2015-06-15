@@ -1,6 +1,12 @@
 {
   "configurations" : [
     {
+      "hive-site": {
+        "javax.jdo.option.ConnectionPassword": "admin",
+        "javax.jdo.option.ConnectionUserName": "hive"
+      }
+    },   
+    {
       "core-site": {
         "hadoop.proxyuser.hbase.groups" : "*",
         "hadoop.proxyuser.hbase.hosts" : "*",
@@ -31,11 +37,64 @@
         "hawq.temp.directory" : " ",
         "hawq.user.password" : "gpadmin",
         "set.os.parameters" : "true",
-        "skip.preinstall.verification" : "true"
+        "skip.preinstall.verification" : "true",
+        "sysctl.vm.overcommit_memory" : "1"
       }
     }
   ],
   "host_groups" : [
+    {
+      "name" : "ambari_host_group",
+      "configurations" : [ ],
+      "components" : [
+        {
+          "name" : "ZOOKEEPER_CLIENT"
+        },
+        {
+          "name" : "PIG"
+        },
+        {
+          "name" : "OOZIE_CLIENT"
+        },
+        {
+          "name" : "HBASE_CLIENT"
+        },
+        {
+          "name" : "HCAT"
+        },
+        {
+          "name" : "KNOX_GATEWAY"
+        },
+        {
+          "name" : "NAGIOS_SERVER"
+        },
+        {
+          "name" : "TEZ_CLIENT"
+        },
+        {
+          "name" : "AMBARI_SERVER"
+        },
+        {
+          "name" : "GANGLIA_SERVER"
+        },
+        {
+          "name" : "HDFS_CLIENT"
+        },
+        {
+          "name" : "HIVE_CLIENT"
+        },
+        {
+          "name" : "YARN_CLIENT"
+        },
+        {
+          "name" : "MAPREDUCE2_CLIENT"
+        },
+        {
+          "name" : "GANGLIA_MONITOR"
+        }
+      ],
+      "cardinality" : "1"
+    },  
     {
       "name" : "host_group_2",
       "configurations" : [ ],
@@ -105,58 +164,6 @@
         },
         {
           "name" : "RESOURCEMANAGER"
-        }
-      ],
-      "cardinality" : "1"
-    },
-    {
-      "name" : "host_group_1",
-      "configurations" : [ ],
-      "components" : [
-        {
-          "name" : "ZOOKEEPER_CLIENT"
-        },
-        {
-          "name" : "PIG"
-        },
-        {
-          "name" : "OOZIE_CLIENT"
-        },
-        {
-          "name" : "HBASE_CLIENT"
-        },
-        {
-          "name" : "HCAT"
-        },
-        {
-          "name" : "KNOX_GATEWAY"
-        },
-        {
-          "name" : "NAGIOS_SERVER"
-        },
-        {
-          "name" : "TEZ_CLIENT"
-        },
-        {
-          "name" : "AMBARI_SERVER"
-        },
-        {
-          "name" : "GANGLIA_SERVER"
-        },
-        {
-          "name" : "HDFS_CLIENT"
-        },
-        {
-          "name" : "HIVE_CLIENT"
-        },
-        {
-          "name" : "YARN_CLIENT"
-        },
-        {
-          "name" : "MAPREDUCE2_CLIENT"
-        },
-        {
-          "name" : "GANGLIA_MONITOR"
         }
       ],
       "cardinality" : "1"

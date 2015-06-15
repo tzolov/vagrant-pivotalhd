@@ -5,7 +5,8 @@
 VAGRANTFILE_API_VERSION = "2"
 
 require 'set'
-
+require 'rubygems'
+require 'json'
 
 # Node(s) to be used as a master. Convention is: 'phd<Number>.localdomain'. Exactly One master node must be provided
 MASTER = ["phd1.localdomain"]
@@ -58,7 +59,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       phd_conf.vm.network :private_network, ip: "10.211.55.#{i+100}"	  
 
       phd_conf.vm.provision "shell" do |s|
-        s.path = "scripts/prepare_all_nodes.sh"
+        s.path = "scripts/prepare_host.sh"
         s.args = NUMBER_OF_CLUSTER_NODES
       end 
 	  
@@ -90,13 +91,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    # Initialization common for all nodes
    ambari.vm.provision "shell" do |s|
-     s.path = "scripts/prepare_all_nodes.sh"
+     s.path = "scripts/prepare_host.sh"
      s.args = NUMBER_OF_CLUSTER_NODES
    end
    
    # Install Ambari 
    ambari.vm.provision "shell" do |s|
-     s.path = "scripts/ambari_install.sh"
+     s.path = "scripts/install_ambari.sh"
    end 
 
    # Register ambari-agents
@@ -110,7 +111,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    # Install Ambari 
    ambari.vm.provision "shell" do |s|
-     s.path = "scripts/start_cluster.sh"
+     s.path = "scripts/deploy_cluster.sh"
 	 s.args = "4-node-blueprint"
    end 
    

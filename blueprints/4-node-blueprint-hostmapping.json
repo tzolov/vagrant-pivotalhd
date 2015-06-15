@@ -3,35 +3,27 @@
   "default_password" : "secret-password",
   "host_groups" : [
     { 
-      "name" : "host_group_1",
+      "name" : "ambari_host_group",
       "hosts": [ 
-        { 
-          "fqdn":"ambari.localdomain" 
-        } 
+        { "fqdn":"ambari.localdomain" } 
       ] 
     },
     { 
       "name" : "host_group_2",
       "hosts": [ 
-        { 
-          "fqdn":"phd1.localdomain" 
-        } 
+        { "fqdn":"phd1.localdomain" } 
       ] 
     },
     { 
       "name" : "host_group_3",
       "hosts": [ 
-        { 
-          "fqdn":"phd2.localdomain" 
-        } 
+        { "fqdn":"phd2.localdomain" } 
       ] 
     },
     { 
       "name" : "host_group_4",
       "hosts" : [ 
-        { 
-          "fqdn":"phd3.localdomain" 
-        } 
+        { "fqdn":"phd3.localdomain" } 
       ] 
     } 
   ] 
