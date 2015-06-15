@@ -1,5 +1,19 @@
 {
-  "configurations" : [    
+  "configurations" : [
+    {
+      "core-site": {
+        "hadoop.proxyuser.hbase.groups" : "*",
+        "hadoop.proxyuser.hbase.hosts" : "*",
+        "hadoop.proxyuser.hcat.groups" : "*",
+        "hadoop.proxyuser.hcat.hosts" : "*",
+        "hadoop.proxyuser.hive.groups" : "*",
+        "hadoop.proxyuser.hive.hosts" : "*",
+        "hadoop.proxyuser.hue.groups" : "*",
+        "hadoop.proxyuser.hue.hosts" : "*",
+        "hadoop.proxyuser.oozie.groups" : "*",
+        "hadoop.proxyuser.oozie.hosts" : "*"
+      }
+    },   
     {
       "nagios-env": {
         "nagios_contact": "admin@localhost.com"
