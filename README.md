@@ -10,18 +10,21 @@ In the process, four virtual machines are created—one for the Pivotal Command 
 * Install [Vagrant](http://www.vagrantup.com/downloads.html) (1.7.2+).
 * Install [VirtualBox](https://www.virtualbox.org/) or VMware Fusion (note that VMWare Fusion requires [paid Vagrant license](http://www.vagrantup.com/vmware)). 
 
-## Setup Vagrant environment
+## Setup the Vagrant environment
 * Clone this project
 ```
 git clone https://github.com/tzolov/vagrant-pivotalhd.git
 ```
 * Forllow the [Packages download](https://github.com/tzolov/vagrant-pivotalhd/tree/master/packages) instructions to collect all reuired tarballs inside the **/packages** subfolder
-* From the top directory run
+
+## Create Hadoop cluster
+From the top directory run
 ```
 vagrant up --provider virtualbox
 ```
 This will create 4 Virtual Machines (ambari.localdomain, phd1.localdomain, phd2.localdomain and ph3.localdomain) and will install Ambari server. Then the Ambari Blueprint REST API is used to deploy and lanch the PHD/HAWQ cluster. 
-When the **vagrant up** command complete the VMs are provisiond, the Ambari Server is installed and running and the cluster deployment is in progrees (could take about 30 min to deploy the cluster). Use the Ambari Web UI to monitor the cluster deployment progress. Open this link in your browser:
+
+When the **vagrant up** command completes (after ~10 min) the VMs are provisioned and the Ambari Server is installed. The cluster deployment is in progrees (could take ~30 min) and you can use the Ambari Web UI to monitor the progress. For this open the ambari page in a browser:
 ```
 https://10.211.55.100:8080
 ```
