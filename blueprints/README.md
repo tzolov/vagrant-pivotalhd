@@ -2,15 +2,15 @@
 
 [Ambari Blueprints](http://docs.hortonworks.com/HDPDocuments/Ambari-1.7.0.0/Ambari_Doc_Suite/ADS_v170.html#ref-63312e0d-d7f1-42b7-9a7e-1663357087f6) provide an API to perform cluster installations. You can build a reusable “blueprint” that defines which Stack to use, how Service Components should be laid-out across a cluster, and what configurations to set.
 
-If you are not familiar with the Blueprints concept check this short but useful article: [Using Ambari Blueprints](https://blog.codecentric.de/en/2014/05/lambda-cluster-provisioning/)
+Read this short article: [Using Ambari Blueprints](https://blog.codecentric.de/en/2014/05/lambda-cluster-provisioning/) to get up to speed with the Ambari Blueprint concepts. 
 
 > **Blueprints**: defines the logical structure of a cluster, without needing informations about the actual infrastructure. Therefore you can use the same blueprint for different amount of nodes, different IPs and different domain names.
 
-Couple of predefined blueprint files are provided: [hdfs-hawq-only-blueprint.json](hdfs-hawq-only-blueprint.json) (default) and [all-phd3-hawq-services-blueprint.json](all-phd3-hawq-services-blueprint.json) but you can define your own and set the path via the `BLUEPRINT_FILE` property in the [Vagrantfile](../Vagrantfile). 
+Couple of predefined blueprint files are provided: [hdfs-hawq-only-blueprint.json](hdfs-hawq-only-blueprint.json) and [all-phd3-hawq-services-blueprint.json](all-phd3-hawq-services-blueprint.json) (default) but you can define your own and set the path via the [Vagrantfile](../Vagrantfile) `BLUEPRINT_FILE` property. 
 
 > **Host Mapping**: The actual cluster creation you also need a second JSON File. Basically the work left is to tell Ambari which blueprint it shoud use and which host should be in which host group. With the attribute `blueprint` you can define the name of the blueprint. Then you can define the hosts of each host group. e.g. we define the host `phd1.localdomain` to be in `host_group_1` of `blueprint-c1` 
 
-Again several host mapping files are provided here: [2-node-simple-hostmapping.json](2-node-simple-hostmapping.json) (default) and [4-node-all-services-hostmapping.json](4-node-all-services-hostmapping.json) but you can build your own host mapping file and set the path via the `HOST_MAPPING_FILE`property in the [Vagrantfile](../Vagrantfile). 
+Again several host mapping files are provided here: [2-node-simple-hostmapping.json](2-node-simple-hostmapping.json) and [4-node-all-services-hostmapping.json](4-node-all-services-hostmapping.json) (default) but you can build your own host mapping file and set the path via the [Vagrantfile](../Vagrantfile) `HOST_MAPPING_FILE`property. 
 
 ## Predefined Bluprints/Host Mapptings
 
