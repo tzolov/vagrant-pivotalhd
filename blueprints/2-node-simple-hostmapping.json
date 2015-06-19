@@ -1,0 +1,16 @@
+{ 
+  "blueprint" : "hdfs-hawq-only-blueprint",
+  "default_password" : "secret-password",
+  "host_groups" : [
+    { 
+      "name" : "management_smasters",
+      "hosts": [ { "fqdn":"ambari.localdomain" }  ] 
+    },
+    { 
+      "name" : "masters_workers",
+      "hosts": [ { "fqdn":"phd1.localdomain" } ] 
+    } 
+  ] 
+}
+
+

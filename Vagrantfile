@@ -9,14 +9,14 @@ require 'rubygems'
 require 'json'
 
 # Set the name of the cluster to be deployed
-CLUSTER_NAME = "phd30cluster1"
+CLUSTER_NAME = "PHD30C1"
 
 # Provide the path to the blueprint file to use
-BLUEPRINT_FILE = "blueprints/4-node-blueprint.json"
+BLUEPRINT_FILE = "blueprints/all-phd3-hawq-services-blueprint.json"
 
 # Provide the path to the host-mapping file that uses the above blueprint 
 # to deploy the cluster
-BLUEPRINT_HOSTMAPPING_FILE = "blueprints/4-node-blueprint-hostmapping.json"
+HOST_MAPPING_FILE = "blueprints/4-node-all-services-hostmapping.json"
 
 # Set the Ambari host name (THE FQDN NAME SHOULD NOT be in the phd[1-N].localdomain range)
 AMBARI_HOSTNAME_PREFIX = "ambari"
@@ -42,12 +42,13 @@ AMBARI_HOSTNAME_FQDN = "#{AMBARI_HOSTNAME_PREFIX}.localdomain"
 # Parse the blueprint spec
 blueprint_spec = JSON.parse(open(BLUEPRINT_FILE).read)
 BLUEPRINT_SPEC_NAME = blueprint_spec["Blueprints"]["blueprint_name"]
+print "CLUSTER: #{CLUSTER_NAME} \n"
 print "BLUEPRINT: #{BLUEPRINT_SPEC_NAME} \n"
 print "STACK: #{blueprint_spec['Blueprints']['stack_name']}-#{blueprint_spec['Blueprints']['stack_version']} \n"
 
 # Read the host-mapping file to extract the blueprint name and the 
 # cluster node hostnames
-host_mapping = JSON.parse(open(BLUEPRINT_HOSTMAPPING_FILE).read)
+host_mapping = JSON.parse(open(HOST_MAPPING_FILE).read)
 
 # Extract the Blueprint name from the host mapping file
 BLUEPRINT_NAME = host_mapping["blueprint"]
@@ -58,7 +59,7 @@ if (BLUEPRINT_SPEC_NAME != BLUEPRINT_NAME)
 	exit
 end
 
-print "HOST-MAPPING FILE: #{BLUEPRINT_HOSTMAPPING_FILE} \n"
+print "HOST-MAPPING FILE: #{HOST_MAPPING_FILE} \n"
 
 # List of cluster node hostnames. Convention is: 'phd<Number>.localdomain'
 NODES = Set.new([])
@@ -74,6 +75,8 @@ NODES.delete(AMBARI_HOSTNAME_FQDN);
 
 # Compute the total number of nodes in the cluster 	    
 NUMBER_OF_CLUSTER_NODES = NODES.size
+
+print "Number of cluster nodes (excluding Ambari): #{NUMBER_OF_CLUSTER_NODES} \n"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   
@@ -166,7 +169,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	           CLUSTER_NAME, 
 	           BLUEPRINT_NAME, 
 	           "/vagrant/" + BLUEPRINT_FILE, 
-	           "/vagrant/" + BLUEPRINT_HOSTMAPPING_FILE]
+	           "/vagrant/" + HOST_MAPPING_FILE]
    end    
   end
 end

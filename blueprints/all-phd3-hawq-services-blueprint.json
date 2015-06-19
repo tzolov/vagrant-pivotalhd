@@ -1,4 +1,10 @@
 {
+  "Blueprints" : {
+    "stack_name" : "PHD",
+    "stack_version" : "3.0",
+    "blueprint_name": "all-phd3-hawq-services-blueprint"
+  }, 
+  
   "configurations" : [
     {
       "hive-site": {
@@ -42,6 +48,7 @@
       }
     }
   ],
+  
   "host_groups" : [
     {
       "name" : "ambari_host_group",
@@ -302,10 +309,5 @@
       ],
       "cardinality" : "1"
     }
-  ],
-  "Blueprints" : {
-    "stack_name" : "PHD",
-    "stack_version" : "3.0",
-    "blueprint_name": "4-node-blueprint"
-  }
+  ]
 }
