@@ -6,11 +6,32 @@ If you are not familiar with the Blueprints concept check this short but useful 
 
 > **Blueprints**: defines the logical structure of a cluster, without needing informations about the actual infrastructure. Therefore you can use the same blueprint for different amount of nodes, different IPs and different domain names.
 
-Couple of predefined blueprint files are provided: `4-node-blueprint.json` (default) and `2-node-blueprint.json` but you can define your own and set the path to it in the `Vagrant` file. 
+Couple of predefined blueprint files are provided: [hdfs-hawq-only-blueprint.json](hdfs-hawq-only-blueprint.json) (default) and [all-phd3-hawq-services-blueprint.json](all-phd3-hawq-services-blueprint.json) but you can define your own and set the path via the `BLUEPRINT_FILE` property in the [Vagrantfile](../Vagrantfile). 
 
 > **Host Mapping**: The actual cluster creation you also need a second JSON File. Basically the work left is to tell Ambari which blueprint it shoud use and which host should be in which host group. With the attribute `blueprint` you can define the name of the blueprint. Then you can define the hosts of each host group. e.g. we define the host `phd1.localdomain` to be in `host_group_1` of `blueprint-c1` 
 
-Again several host mapping files are provided here: `4-node-blueprint-hostmapping.json` (default) and `2-node-blueprint-hostmapping.json` but you can build your own host mapping file and set the path inthe Vagrant file. 
+Again several host mapping files are provided here: [2-node-simple-hostmapping.json](2-node-simple-hostmapping.json) (default) and [4-node-all-services-hostmapping.json](4-node-all-services-hostmapping.json) but you can build your own host mapping file and set the path via the `HOST_MAPPING_FILE`property in the [Vagrantfile](../Vagrantfile). 
+
+## Predefined Bluprints/Host Mapptings
+
+#### Simple HDFS + HAWQ specification. 
+Combination of [hdfs-hawq-only-blueprint.json](hdfs-hawq-only-blueprint.json) and [2-node-simple-hostmapping.json](2-node-simple-hostmapping.json) denfine a 2 node cluster with the following layout:
+
+| Host name | Services |
+| -------------------|------------------------------|
+| ambari.localadmin | Ambari, Nagios, Ganglia, HAWQ SMaster, SNameNode |
+| phd1.localadmin | NameNode, DataNode, HAWQ Segment, PXF, HAWQ Master |
+
+#### All PHD3.0 services specification. 
+The [all-phd3-hawq-services-blueprint.json](all-phd3-hawq-services-blueprint.json) and [4-node-all-services-hostmapping.json](4-node-all-services-hostmapping.json) spec defines a 4 node cluster with the following layout:
+
+| Host name | Services |
+| -------------------|------------------------------|
+| ambari.localadmin | Ambari, Nagios, Ganglia |
+| phd1.localadmin | HAWQ SMaster, NameNode, HiveServer2, Hive Metastore, ResourceManager, WebHCat Server, DataNode, HAWQ Segment, RegionServer, NodeManager, PXF |
+| phd2.localadmin | App Timeline Server, History Server, HBase Master, Oozie Server, SNameNode, Zookeeper Server, DataNode, HAWQ Segment, RegionServer, NodeManager, PXF |
+| phd3.localadmin | HAWQ Master, DataNode, HAWQ Segment, RegionServer, NodeManager, PXF |
+
 
 #### References 
 * [Ambari Blueprints API](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints)
