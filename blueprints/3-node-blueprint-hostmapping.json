@@ -1,0 +1,26 @@
+{ 
+  "blueprint" : "3-node-blueprint",
+  "default_password" : "secret-password",
+  "host_groups" : [
+    { 
+      "name" : "ambari_host_group",
+      "hosts": [ 
+        { "fqdn":"ambari.localdomain" } 
+      ] 
+    },
+    { 
+      "name" : "host_group_nn_shawq",
+      "hosts": [ 
+        { "fqdn":"phd1.localdomain" } 
+      ] 
+    },
+    { 
+      "name" : "host_group_hawq_snn",
+      "hosts": [ 
+        { "fqdn":"phd2.localdomain" } 
+      ] 
+    } 
+  ] 
+}
+
+

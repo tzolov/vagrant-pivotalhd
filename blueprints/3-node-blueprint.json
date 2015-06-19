@@ -1,0 +1,133 @@
+{
+  "configurations" : [  
+    {
+      "core-site": {
+        "hadoop.proxyuser.hbase.groups" : "*",
+        "hadoop.proxyuser.hbase.hosts" : "*",
+        "hadoop.proxyuser.hcat.groups" : "*",
+        "hadoop.proxyuser.hcat.hosts" : "*",
+        "hadoop.proxyuser.hive.groups" : "*",
+        "hadoop.proxyuser.hive.hosts" : "*",
+        "hadoop.proxyuser.hue.groups" : "*",
+        "hadoop.proxyuser.hue.hosts" : "*",
+        "hadoop.proxyuser.oozie.groups" : "*",
+        "hadoop.proxyuser.oozie.hosts" : "*"
+      }
+    },   
+    {
+      "nagios-env": {
+        "nagios_contact": "admin@localhost.com"
+      }
+    },
+    {
+      "hawq-site" : {
+        "hawq.cluster.name" : "HAWQ",
+        "hawq.data.directory" : "/data/hawq/segments",
+        "hawq.master.directory" : "/data/hawq/master",
+        "hawq.master.keytab.file" : "/etc/security/keytabs/hawq.service.keytab",
+        "hawq.master.port" : "5432",
+        "hawq.segment.base.port" : "40000",
+        "hawq.segments.per.node" : "4",
+        "hawq.temp.directory" : " ",
+        "hawq.user.password" : "gpadmin",
+        "set.os.parameters" : "true",
+        "skip.preinstall.verification" : "true",
+        "sysctl.vm.overcommit_memory" : "1"
+      }
+    }
+  ],
+  "host_groups" : [
+    {
+      "name" : "ambari_host_group",
+      "configurations" : [ ],
+      "components" : [
+        {
+          "name" : "ZOOKEEPER_CLIENT"
+        },
+        {
+          "name" : "NAGIOS_SERVER"
+        },
+        {
+          "name" : "AMBARI_SERVER"
+        },
+        {
+          "name" : "GANGLIA_SERVER"
+        },
+        {
+          "name" : "HDFS_CLIENT"
+        },
+        {
+          "name" : "GANGLIA_MONITOR"
+        }
+      ],
+      "cardinality" : "1"
+    },  
+    {
+      "name" : "host_group_nn_shawq",
+      "configurations" : [ ],
+      "components" : [
+        {
+          "name" : "NAMENODE"
+        },
+        {
+          "name" : "PXF"
+        },
+        {
+          "name" : "HAWQSEGMENT"
+        },
+        {
+          "name" : "HDFS_CLIENT"
+        },
+        {
+          "name" : "DATANODE"
+        },
+        {
+          "name" : "GANGLIA_MONITOR"
+        },
+        {
+          "name" : "HAWQSTANDBY"
+        }
+      ],
+      "cardinality" : "1"
+    },
+    {
+      "name" : "host_group_hawq_snn",
+      "configurations" : [ ],
+      "components" : [
+        {
+          "name" : "ZOOKEEPER_SERVER"
+        },
+        {
+          "name" : "ZOOKEEPER_CLIENT"
+        },
+        {
+          "name" : "SECONDARY_NAMENODE"
+        },
+        {
+          "name" : "PXF"
+        },
+        {
+          "name" : "HAWQSEGMENT"
+        },
+        {
+          "name" : "HDFS_CLIENT"
+        },
+        {
+          "name" : "DATANODE"
+        },
+        {
+          "name" : "HAWQMASTER"
+        },
+        {
+          "name" : "GANGLIA_MONITOR"
+        }
+      ],
+      "cardinality" : "1"
+    }
+  ],
+  "Blueprints" : {
+    "stack_name" : "PHD",
+    "stack_version" : "3.0",
+    "blueprint_name": "3-node-blueprint"
+  }
+}
