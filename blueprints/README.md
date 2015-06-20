@@ -17,12 +17,12 @@ Again several host mapping files are provided here: [2-node-simple-hostmapping.j
 
 _Note: paths to the custom blueprints and host-mapping files has to be relative to the location of the Vagrantfile!_
 
-#### Host Mapping Convention
-To simplify the Vagrant and provisioning files the follwoing hostname convention. Use this convention in your **Host Mapping** specs or Vagrantfile will not be able to provision the required VMs. 
+#### Host Mapping Name Convention
+To simplify the Vagrantfile the follwoing hostname convention is enforced:
 * Ambari hostname - defaults to `ambari.localdomain`. You can override the `ambari` prefix via the [Vagrantfile](../Vagrantfile) `AMBARI_HOSTNAME_PREFIX`property. The domain is fixed to `.localdomain`. 
-* Cluster hostnames - cluster nodes use this pattern to assigne hostnames: `phd<NodeIndex>.localdomain`. For example for a cluster with N nodes hostnames should look like this: `phd1.localdomain` ... `phdN.localdomain`. The index starts from `1` and increments consequatively (**with no gaps**).  `N` corresponds to the number of cluster nodes (excluding the Ambari node).
+* Cluster hostnames - cluster nodes are named like this: `phd<NodeIndex>.localdomain`. For a cluster with N nodes, the hostnames are: `phd1.localdomain` ... `phdN.localdomain`. Index starts from `1` and increments consequatively (**no gaps**) to N. `N` is the size of the cluster excluding the Ambari node.
 
-Make shure that the Ambari hostname does not overlap with any of the cluster node names. 
+Follow this convention in your **Host Mapping** specs or Vagrantfile will not be able to provision the required VMs. If you alter the Ambari name make shure it does not overlap with any of the cluster node names. 
 
 ## Predefined Bluprints/Host Mapptings
 
