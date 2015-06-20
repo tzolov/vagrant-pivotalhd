@@ -1,16 +1,16 @@
-vagrant-pivotalhd
+Vagrant and Ambari Blueprints to bluild PivotalHD3.0/HAWQ cluster
 =================
-Vagrant scripts to install PivotalHD 3.0 Hadoop distribution along with HAWQ 1.3 (SQL engine) and Apache Ambari.
+Vagrant scripts to install PivotalHD 3.0 Hadoop distribution along with HAWQ 1.3 (SQL on Hadoop) and Apache Ambari.
 
 > After hardware is available and software packages are downloaded, there is a Vagrant-based, single-command install process that will set-up either VMware Fusion VMs or VirtualBox VMs by default with CentOS. 
-In the process, four virtual machines are created—one for the Pivotal Command Center and three for the Pivotal HD cluster where Apache Hadoop® (HDFS, YARN, Pig, Zookeeper, HBase), HAWQ (SQL-on-HDFS analytic data warehouse)
+Default blueprint creates four virtual machines  — one for the Apache Ambari and three for the Pivotal HD cluster where Apache Hadoop® (HDFS, YARN, Pig, Zookeeper, HBase), HAWQ (SQL-on-HDFS analytic data warehouse)
 
 ## Prerequisite 
-* From a hardware standpoint, you need 64-bit architecture, at least 16GB of physical memory and around 120GB of free disc space (you can configure with only 24GB of disc space but you will not be able to install all Pivotal services together.
+* From a hardware standpoint, you need 64-bit architecture, the four VMs blueprint requires at least 16GB of physical memory and around 120GB of free disc space (you can configure with only 24GB of disc space but you will not be able to install all Pivotal services together.
 * Install [Vagrant](http://www.vagrantup.com/downloads.html) (1.7.2+).
 * Install [VirtualBox](https://www.virtualbox.org/) or VMware Fusion (note that VMWare Fusion requires [paid Vagrant license](http://www.vagrantup.com/vmware)). 
 
-## Prepare the Vagrant environment
+## Prepare the Vagrant/Blueprints environment
 * Clone this project
 ```
 git clone https://github.com/tzolov/vagrant-pivotalhd.git
