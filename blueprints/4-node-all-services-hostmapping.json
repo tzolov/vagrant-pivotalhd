@@ -1,30 +1,22 @@
 { 
-  "blueprint" : "all-phd3-hawq-services-blueprint",
+  "blueprint" : "all-services-blueprint",
   "default_password" : "secret-password",
   "host_groups" : [
     { 
-      "name" : "ambari_host_group",
-      "hosts": [ 
-        { "fqdn":"ambari.localdomain" } 
-      ] 
+      "name" : "ambari_gang_nag_knox_clients_group",
+      "hosts": [ { "fqdn":"ambari.localdomain" } ] 
     },
     { 
-      "name" : "host_group_2",
-      "hosts": [ 
-        { "fqdn":"phd1.localdomain" } 
-      ] 
+      "name" : "nn_yarn_hive_hcat_workers_clients_group",
+      "hosts": [ { "fqdn":"phd1.localdomain" } ] 
     },
     { 
-      "name" : "host_group_3",
-      "hosts": [ 
-        { "fqdn":"phd2.localdomain" } 
-      ] 
+      "name" : "hbase_hist_shawq_spring_xd_workers_clients_group",
+      "hosts": [ { "fqdn":"phd2.localdomain" } ] 
     },
     { 
-      "name" : "host_group_4",
-      "hosts" : [ 
-        { "fqdn":"phd3.localdomain" } 
-      ] 
+      "name" : "hawq_zk_snn_workers_clients_group",
+      "hosts" : [ { "fqdn":"phd3.localdomain" } ] 
     } 
   ] 
 }

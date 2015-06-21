@@ -1,0 +1,190 @@
+{
+  "Blueprints" : {
+    "stack_name" : "PHD",
+    "stack_version" : "3.0",
+    "blueprint_name": "all-services-blueprint"
+  }, 
+  
+  "configurations" : [
+    {
+      "hive-site": {
+        "javax.jdo.option.ConnectionPassword": "admin",
+        "javax.jdo.option.ConnectionUserName": "hive"
+      }
+    },   
+    {
+      "core-site": {
+        "hadoop.proxyuser.hbase.groups" : "*",
+        "hadoop.proxyuser.hbase.hosts" : "*",
+        "hadoop.proxyuser.hcat.groups" : "*",
+        "hadoop.proxyuser.hcat.hosts" : "*",
+        "hadoop.proxyuser.hive.groups" : "*",
+        "hadoop.proxyuser.hive.hosts" : "*",
+        "hadoop.proxyuser.hue.groups" : "*",
+        "hadoop.proxyuser.hue.hosts" : "*",
+        "hadoop.proxyuser.oozie.groups" : "*",
+        "hadoop.proxyuser.oozie.hosts" : "*"
+      }
+    },   
+    {
+      "nagios-env": {
+        "nagios_contact": "admin@localhost.com"
+      }
+    },
+    {
+      "hawq-site" : {
+        "hawq.cluster.name" : "HAWQ",
+        "hawq.data.directory" : "/data/hawq/segments",
+        "hawq.master.directory" : "/data/hawq/master",
+        "hawq.master.keytab.file" : "/etc/security/keytabs/hawq.service.keytab",
+        "hawq.master.port" : "5432",
+        "hawq.segment.base.port" : "40000",
+        "hawq.segments.per.node" : "4",
+        "hawq.temp.directory" : " ",
+        "hawq.user.password" : "gpadmin",
+        "set.os.parameters" : "true",
+        "skip.preinstall.verification" : "true",
+        "sysctl.vm.overcommit_memory" : "1"
+      }
+    },
+    {
+      "springxd-site" : {
+        "hsql.server.port" : "9101",
+        "server.port" : "9393",
+        "spring.rabbitmq.addresses" : " ",
+        "spring.redis.host" : "ambari.localdomain",
+        "spring.redis.port" : "6379",
+        "xd.messagebus.kafka.brokers" : " ",
+        "xd.transport" : " redis"
+      }
+    }	
+  ],
+  
+  "host_groups" : [
+    {
+      "name" : "ambari_gang_nag_knox_clients_group",
+      "configurations" : [ ],
+      "components" : [
+        {"name" : "AMBARI_SERVER"},		  
+        {"name" : "KNOX_GATEWAY"},
+        {"name" : "NAGIOS_SERVER"},
+        {"name" : "GANGLIA_SERVER"},
+		  
+        {"name" : "ZOOKEEPER_CLIENT"},
+        {"name" : "PIG"},
+        {"name" : "OOZIE_CLIENT"},
+        {"name" : "HBASE_CLIENT"},
+        {"name" : "HCAT"},
+        {"name" : "TEZ_CLIENT"},
+        {"name" : "HDFS_CLIENT"},
+        {"name" : "HIVE_CLIENT"},
+        {"name" : "YARN_CLIENT"},
+        {"name" : "MAPREDUCE2_CLIENT"},
+        {"name" : "SPRINGXDSHELL"},		
+
+        {"name" : "GANGLIA_MONITOR"}
+      ],
+      "cardinality" : "1"
+    },  
+    {
+      "name" : "nn_yarn_hive_hcat_workers_clients_group",
+      "configurations" : [ ],
+      "components" : [
+        {"name" : "NAMENODE"},
+        {"name" : "RESOURCEMANAGER"},			
+        {"name" : "HIVE_SERVER"},
+        {"name" : "HIVE_METASTORE"},
+        {"name" : "MYSQL_SERVER"},
+        {"name" : "WEBHCAT_SERVER"},	
+
+        {"name" : "DATANODE"},
+        {"name" : "NODEMANAGER"},		
+        {"name" : "HBASE_REGIONSERVER"},
+        {"name" : "HAWQSEGMENT"},				
+        {"name" : "PXF"},		
+		{"name" : "SPRINGXDCONTAINER"},		
+
+        {"name" : "ZOOKEEPER_CLIENT"},
+        {"name" : "PIG"},
+        {"name" : "OOZIE_CLIENT"},
+        {"name" : "HBASE_CLIENT"},
+        {"name" : "HCAT"},
+        {"name" : "TEZ_CLIENT"},
+        {"name" : "HDFS_CLIENT"},
+        {"name" : "HIVE_CLIENT"},
+        {"name" : "YARN_CLIENT"},
+        {"name" : "MAPREDUCE2_CLIENT"},
+        {"name" : "SPRINGXDSHELL"},
+		
+        {"name" : "GANGLIA_MONITOR"}						
+      ],
+      "cardinality" : "1"
+    },
+    {
+      "name" : "hbase_hist_shawq_spring_xd_workers_clients_group",
+      "configurations" : [ ],
+      "components" : [
+        {"name" : "SPRINGXDHSQL"},		  
+        {"name" : "SPRINGXDADMIN"},		
+        {"name" : "HISTORYSERVER"},
+        {"name" : "HBASE_MASTER"},
+        {"name" : "APP_TIMELINE_SERVER"},
+        {"name" : "HAWQSTANDBY"},
+		
+        {"name" : "DATANODE"},
+        {"name" : "NODEMANAGER"},		
+        {"name" : "HBASE_REGIONSERVER"},
+        {"name" : "HAWQSEGMENT"},				
+        {"name" : "PXF"},		
+		{"name" : "SPRINGXDCONTAINER"},		
+		  
+        {"name" : "ZOOKEEPER_CLIENT"},
+        {"name" : "PIG"},
+        {"name" : "OOZIE_CLIENT"},
+        {"name" : "HBASE_CLIENT"},
+        {"name" : "HCAT"},
+        {"name" : "TEZ_CLIENT"},
+        {"name" : "HDFS_CLIENT"},
+        {"name" : "HIVE_CLIENT"},
+        {"name" : "YARN_CLIENT"},
+        {"name" : "MAPREDUCE2_CLIENT"},
+        {"name" : "SPRINGXDSHELL"},		
+		
+        {"name" : "GANGLIA_MONITOR"}
+      ],
+      "cardinality" : "1"
+    },
+    {
+      "name" : "hawq_zk_snn_workers_clients_group",
+      "configurations" : [ ],
+      "components" : [
+        {"name" : "ZOOKEEPER_SERVER"},
+        {"name" : "SECONDARY_NAMENODE"},
+        {"name" : "HAWQMASTER"},
+
+        {"name" : "DATANODE"},
+        {"name" : "NODEMANAGER"},		
+        {"name" : "HBASE_REGIONSERVER"},
+        {"name" : "HAWQSEGMENT"},				
+        {"name" : "PXF"},		
+		{"name" : "SPRINGXDCONTAINER"},		
+		
+        {"name" : "ZOOKEEPER_CLIENT"},
+        {"name" : "PIG"},
+        {"name" : "OOZIE_CLIENT"},
+        {"name" : "HBASE_CLIENT"},
+        {"name" : "OOZIE_SERVER"},
+        {"name" : "HCAT"},
+        {"name" : "TEZ_CLIENT"},
+        {"name" : "HDFS_CLIENT"},
+        {"name" : "HIVE_CLIENT"},
+        {"name" : "YARN_CLIENT"},
+        {"name" : "MAPREDUCE2_CLIENT"},
+        {"name" : "SPRINGXDSHELL"},		
+
+        {"name" : "GANGLIA_MONITOR"}		
+      ],
+      "cardinality" : "1"
+    }
+  ]
+}

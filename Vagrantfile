@@ -8,28 +8,39 @@ require 'set'
 require 'rubygems'
 require 'json'
 
+###############################################################################
+#   CONFIGURATION PARAMETERS
+###############################################################################
+# Edit the following parameters to configure your cluster deployment. 
+
 # Set the name of the cluster to be deployed
 CLUSTER_NAME = "PHD30C1"
 
-# Provide the path to the blueprint file to use
-BLUEPRINT_FILE = "blueprints/all-phd3-hawq-services-blueprint.json"
+# Set the Blueprint file name that defines the cluster to be deployed. 
+# File must exist under the /blueprints subfolder!
+BLUEPRINT_FILE_NAME = "all-services-blueprint.json"
 
-# Provide the path to the host-mapping file that uses the above blueprint to deploy the cluster
-HOST_MAPPING_FILE = "blueprints/4-node-all-services-hostmapping.json"
+# Set the Host-Mapping file name that maps the above Blueprint into physical nodes. 
+# File must exist under the /blueprints subfolder!
+HOST_MAPPING_FILE_NAME = "4-node-all-services-hostmapping.json"
 
 # Set the Ambari host name (THE FQDN NAME SHOULD NOT be in the phd[1-N].localdomain range)
 AMBARI_HOSTNAME_PREFIX = "ambari"
 
 # Specify the Vagrant box name to use. Tested options are:
-#   bigdata/centos6.4_x86_64 - 40G disk space.
-#   bigdata/centos6.4_x86_64_small - just 8G of disk space. Not enough for Hue!
+# - bigdata/centos6.4_x86_64 - 40G disk space.
+# - bigdata/centos6.4_x86_64_small - just 8G of disk space. Not enough for Hue!
 VM_BOX = "bigdata/centos6.4_x86_64"
 
 # Set the memory (MB) allocated for the AMBARI VM
-AMBARI_MEMORY_MB = "768"
+AMBARI_NODE_VM_MEMORY_MB = "768"
 
 # Set the memory (MB) allocated for every PHD node VM
-WORKER_PHD_MEMORY_MB = "2048"
+PHD_NODE_VM_MEMORY_MB = "2048"
+
+# Set TRUE to deploy a cluster defined with BLUEPRINT_FILE_NAME and HOST_MAPPING_FILE_NAME.
+# Set FALSE to stop the installation after the Aambari Server installation. 
+DEPLOY_BLUEPRINT_CLUSTER = TRUE
 
 ###############################################################################
 #    DON'T CHANGE THE CONTENT BELOW
@@ -39,25 +50,25 @@ WORKER_PHD_MEMORY_MB = "2048"
 AMBARI_HOSTNAME_FQDN = "#{AMBARI_HOSTNAME_PREFIX}.localdomain"
 
 # Parse the blueprint spec
-blueprint_spec = JSON.parse(open(BLUEPRINT_FILE).read)
+blueprint_spec = JSON.parse(open("blueprints/" + BLUEPRINT_FILE_NAME).read)
 BLUEPRINT_SPEC_NAME = blueprint_spec["Blueprints"]["blueprint_name"]
-print "CLUSTER: #{CLUSTER_NAME} \n"
-print "BLUEPRINT: #{BLUEPRINT_SPEC_NAME} \n"
+
+# Print deployment info
+print "CLUSTER NAME: #{CLUSTER_NAME} \nBLUEPRINT NAME: #{BLUEPRINT_SPEC_NAME} \n"
 print "STACK: #{blueprint_spec['Blueprints']['stack_name']}-#{blueprint_spec['Blueprints']['stack_version']} \n"
+print "BLUEPRINT FILE: #{BLUEPRINT_FILE_NAME} \nHOST-MAPPING FILE: #{HOST_MAPPING_FILE_NAME} \n"
 
 # Read the host-mapping file to extract the blueprint name and the cluster node hostnames
-host_mapping = JSON.parse(open(HOST_MAPPING_FILE).read)
+host_mapping = JSON.parse(open("blueprints/" + HOST_MAPPING_FILE_NAME).read)
 
 # Extract the Blueprint name from the host mapping file
 BLUEPRINT_NAME = host_mapping["blueprint"]
 
 # Validate that the Blueprint set in the host mapping file aligns with the name of the blueprint provided
 if (BLUEPRINT_SPEC_NAME != BLUEPRINT_NAME)
-	print "Host-Mapping blueprint:(#{BLUEPRINT_NAME}) doesn't match Blueprint spec: (#{BLUEPRINT_SPEC_NAME})! \n"
+	print "Host-Mapping blueprint name:(#{BLUEPRINT_NAME}) doesn't match the Blueprint: (#{BLUEPRINT_SPEC_NAME})! \n"
 	exit
 end
-
-print "HOST-MAPPING FILE: #{HOST_MAPPING_FILE} \n"
 
 # List of cluster node hostnames. Convention is: 'phd<Number>.localdomain'
 NODES = Set.new([])
@@ -85,21 +96,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     
     phd_host_name = "phd#{i}.localdomain"
     
-    # Compute the memory
-    vm_memory_mb = WORKER_PHD_MEMORY_MB
-
     config.vm.define phd_vm_name.to_sym do |phd_conf|
       
       phd_conf.vm.box = VM_BOX
       
       phd_conf.vm.provider :virtualbox do |v|
         v.name = phd_vm_name
-        v.customize ["modifyvm", :id, "--memory", vm_memory_mb]
+        v.customize ["modifyvm", :id, "--memory", PHD_NODE_VM_MEMORY_MB]
       end
       
       phd_conf.vm.provider "vmware_fusion" do |v|
         v.name = phd_vm_name
-        v.vmx["memsize"]  = vm_memory_mb
+        v.vmx["memsize"]  = PHD_NODE_VM_MEMORY_MB
       end     	  
 
       phd_conf.vm.host_name = phd_host_name    
@@ -124,17 +132,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
    ambari.vm.provider :virtualbox do |v|
      v.name = AMBARI_VM_NAME
-     v.customize ["modifyvm", :id, "--memory", AMBARI_MEMORY_MB]
+     v.customize ["modifyvm", :id, "--memory", AMBARI_NODE_VM_MEMORY_MB]
    end
 
    ambari.vm.provider "vmware_fusion" do |v|
      v.name = AMBARI_VM_NAME
-     v.vmx["memsize"]  = AMBARI_MEMORY_MB
+     v.vmx["memsize"]  = AMBARI_NODE_VM_MEMORY_MB
    end  
 
    ambari.vm.hostname = AMBARI_HOSTNAME_FQDN
    ambari.vm.network :private_network, ip: "10.211.55.100"
-   ambari.vm.network :forwarded_port, guest: 5443, host: 5443
+#   ambari.vm.network :forwarded_port, guest: 8080, host: 8080
 
    # Initialization common for all nodes
    ambari.vm.provision "shell" do |s|
@@ -156,14 +164,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    # Fix hostname FQDN
    ambari.vm.provision :shell, :inline => "hostname " + AMBARI_HOSTNAME_FQDN
 
-   # Deploy Hadoop Cluster & Services
-   ambari.vm.provision "shell" do |s|
-     s.path = "provision/deploy_cluster.sh"
-	   s.args = [AMBARI_HOSTNAME_FQDN, 
-	             CLUSTER_NAME, 
-	             BLUEPRINT_NAME, 
-	             "/vagrant/" + BLUEPRINT_FILE, 
-	             "/vagrant/" + HOST_MAPPING_FILE]
-   end    
+   # Deploy Hadoop Cluster & Services as defined in the Blueprint/Host-Mapping files
+   if (DEPLOY_BLUEPRINT_CLUSTER) 
+     ambari.vm.provision "shell" do |s|
+       s.path = "provision/deploy_cluster.sh"
+       s.args = [AMBARI_HOSTNAME_FQDN, CLUSTER_NAME, BLUEPRINT_NAME, 
+                 "/vagrant/blueprints/" + BLUEPRINT_FILE_NAME, 
+	               "/vagrant/blueprints/" + HOST_MAPPING_FILE_NAME]
+     end    
+   end
   end
 end
