@@ -67,8 +67,8 @@ BLUEPRINT_NAME = host_mapping["blueprint"]
 
 # Validate that the Blueprint set in the host mapping file aligns with the name of the blueprint provided
 if (BLUEPRINT_SPEC_NAME != BLUEPRINT_NAME)
-	print "Host-Mapping blueprint name:(#{BLUEPRINT_NAME}) doesn't match the Blueprint: (#{BLUEPRINT_SPEC_NAME})! \n"
-	exit
+  print "Host-Mapping blueprint name:(#{BLUEPRINT_NAME}) doesn't match the Blueprint: (#{BLUEPRINT_SPEC_NAME})! \n"
+  exit
 end
 
 # List of cluster node hostnames. Convention is: 'phd<Number>.localdomain'
@@ -171,7 +171,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
        s.path = "provision/deploy_cluster.sh"
        s.args = [AMBARI_HOSTNAME_FQDN, CLUSTER_NAME, BLUEPRINT_NAME, 
                  "/vagrant/blueprints/" + BLUEPRINT_FILE_NAME, 
-	               "/vagrant/blueprints/" + HOST_MAPPING_FILE_NAME]
+                 "/vagrant/blueprints/" + HOST_MAPPING_FILE_NAME]
      end    
    end
   end
