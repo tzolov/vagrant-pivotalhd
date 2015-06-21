@@ -32,9 +32,10 @@ https://10.211.55.100:8080
 ```
 (username: `admin`, password: `admin`)
 
-## User Configuration Properties
+## Vagrant Configuration Properties
 
-User the following [Vagrantfile](Vagrantfile) properties to customize your cluster deployment. For instructions how to create a custom `Blueprint` or `Host-Mapping` consult the [buleprints](blueprints) section. 
+The following [Vagrantfile](Vagrantfile) configuration properties can be used to customize a cluster deployment. 
+For instructions how to create a custom `Blueprint` or `Host-Mapping` read the [buleprints](blueprints) section.
 
 <table>
 	<thead>
