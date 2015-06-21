@@ -32,29 +32,93 @@ Follow this convention in your **Host Mapping** specs or Vagrantfile will not be
 ###### Simple HDFS + HAWQ specification. 
 Combination of [hdfs-hawq-only-blueprint.json](hdfs-hawq-only-blueprint.json) and [2-node-simple-hostmapping.json](2-node-simple-hostmapping.json) denfine a 2 node cluster with the following layout:
 
-| Host name | Services |
-| -------------------|------------------------------|
-| ambari.localadmin | Ambari, Nagios, Ganglia, HAWQ SMaster, SNameNode |
-| phd1.localadmin | NameNode, DataNode, HAWQ Segment, PXF, HAWQ Master |
+<table>
+	<thead>
+		<tr>
+			<th><sub>Host name</sub></th>
+			<th><sub>Host Group</sub></th>
+			<th><sub>Components</sub></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><sub>ambari.localadmin</sub></td>
+			<td><sub>management_smasters</sub></td>
+			<td><sub>Ambari, Nagios, Ganglia, HAWQ SMaster, SNameNode</sub></td>
+		</tr>
+		<tr>
+			<td><sub>phd1.localadmin</sub></td>
+			<td><sub>masters_workers</sub></td>
+			<td><sub>NameNode, DataNode, HAWQ Segment, PXF, HAWQ Master</sub></td>
+		</tr>
+	</tbody>
+</table>	
 
 ###### All PHD3.0 services specification. 
 The [all-services-blueprint.json](all-services-blueprint.json) and [4-node-all-services-hostmapping.json](4-node-all-services-hostmapping.json) spec defines a 4 node cluster with the following layout:
 
-| Host name | Services |
-| -------------------|------------------------------|
-| ambari.localadmin | Ambari, Nagios, Ganglia |
-| phd1.localadmin | HAWQ SMaster, NameNode, HiveServer2, Hive Metastore, ResourceManager, WebHCat Server, DataNode, HAWQ Segment, RegionServer, NodeManager, PXF |
-| phd2.localadmin | App Timeline Server, History Server, HBase Master, Oozie Server, SNameNode, DataNode, HAWQ Segment, RegionServer, NodeManager, PXF |
-| phd3.localadmin | HAWQ Master, , Zookeeper Server, DataNode, HAWQ Segment, RegionServer, NodeManager, PXF |
+<table>
+	<thead>
+		<tr>
+			<th><sub>Host name</sub></th>
+			<th><sub>Host Group</sub></th>
+			<th><sub>Components</sub></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><sub>ambari.localadmin</sub></td>
+			<td><sub>ambari_gang_nag_knox_clients_group</sub></td>
+			<td><sub>Ambari, Nagios, Ganglia</sub></td>
+		</tr>
+		<tr>
+			<td><sub>phd1.localadmin</sub></td>
+			<td><sub></sub></td>
+			<td><sub>HAWQ SMaster, NameNode, HiveServer2, Hive Metastore, ResourceManager, WebHCat Server, DataNode, HAWQ Segment, RegionServer, NodeManager, PXF</sub></td>
+		</tr>
+		<tr>
+			<td><sub>phd2.localadmin</sub></td>
+			<td><sub>nn_yarn_hive_hcat_workers_clients_group</sub></td>
+			<td><sub>App Timeline Server, History Server, HBase Master, Oozie Server, SNameNode, DataNode, HAWQ Segment, RegionServer, NodeManager, PXF</sub></td>
+		</tr>		
+		<tr>
+			<td><sub>phd3.localadmin</sub></td>
+			<td><sub>hbase_hist_shawq_spring_xd_workers_clients_group</sub></td>
+			<td><sub>HAWQ Master, Zookeeper Server, DataNode, HAWQ Segment, RegionServer, NodeManager, PXF</sub></td>
+		</tr>		
+	</tbody>
+</table>
+
 
 ###### SpringXD, YARN, HDFS, HAWQ Blueprint. 
 The [springxd-hdfs-yarn-zk-hawq-blueprint.json](springxd-hdfs-yarn-zk-hawq-blueprint.json) and [3-node-springxd-hostmapping.json](3-node-springxd-hostmapping.json) spec defines a 3 node cluster with the following layout:
 
-| Host name | Services |
-| -------------------|------------------------------|
-| ambari.localadmin | Ambari, Nagios, Ganglia |
-| phd1.localadmin | HAWQ Master, App Timeline Server, History Server, NameNode, ResourceManager, SpringXdAdmin, SpringXdHsql, DataNode, HAWQ Segment, NodeManager, PXF, SpringXdContainer, Zookeeper Server |
-| phd2.localadmin | HAWQ SMaster, SNameNode DataNode, HAWQ Segment, NodeManager, PXF, SpringXdContainer |
+<table>
+	<thead>
+		<tr>
+			<th><sub>Host name</sub></th>
+			<th><sub>Host Group</sub></th>
+			<th><sub>Components</sub></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><sub>ambari.localadmin</sub></td>
+			<td><sub>management_group</sub></td>
+			<td><sub>Ambari, Nagios, Ganglia</sub></td>
+		</tr>
+		<tr>
+			<td><sub>phd1.localadmin</sub></td>
+			<td><sub>masters_group</sub></td>
+			<td><sub>HAWQ Master, App Timeline Server, History Server, NameNode, ResourceManager, SpringXdAdmin, SpringXdHsql, DataNode, HAWQ Segment, NodeManager, PXF, SpringXdContainer, Zookeeper Server</sub></td>
+		</tr>
+		<tr>
+			<td><sub>phd2.localadmin</sub></td>
+			<td><sub>standby_masters_group</sub></td>
+			<td><sub>HAWQ SMaster, SNameNode DataNode, HAWQ Segment, NodeManager, PXF, SpringXdContainer</sub></td>
+		</tr>		
+	</tbody>
+</table>
 
 
 #### References 
