@@ -5,22 +5,23 @@
 #### Concepts
 The `Blueprint` defines the logical structure of a cluster while the `Host-Mapping` specifies how this logical structure is mapped into `physical` machines. 
 
-([Using Ambari Blueprints](https://blog.codecentric.de/en/2014/05/lambda-cluster-provisioning/)) articles introduces the core concepts. Here are some quotes:
+The [Using Ambari Blueprints](https://blog.codecentric.de/en/2014/05/lambda-cluster-provisioning/) article provides a nice introduction of the core concepts.
 
 ###### Blueprints
 > defines the logical structure of a cluster, without needing informations about the actual infrastructure. Therefore you can use the same blueprint for different amount of nodes, different IPs and different domain names.
 
-To get you started we provide couple of predefined blueprints: [hdfs-hawq-only-blueprint.json](hdfs-hawq-only-blueprint.json) and [all-services-blueprint.json](all-services-blueprint.json) (default). You can create your own bluprint and set it via the [Vagrantfile](../Vagrantfile) `BLUEPRINT_FILE_NAME` property. 
+To get you started a couple of predefined blueprints are provided: [hdfs-hawq-only-blueprint.json](hdfs-hawq-only-blueprint.json), [springxd-hdfs-yarn-zk-hawq-blueprint.json](springxd-hdfs-yarn-zk-hawq-blueprint.json) and [all-services-blueprint.json](all-services-blueprint.json) (default). You can create your own blueprint and select it through the [Vagrantfile](../Vagrantfile) `BLUEPRINT_FILE_NAME` property. 
 
 ###### Host Mapping
-> The actual cluster creation you also need a second JSON File. Basically the work left is to tell Ambari which blueprint it shoud use and which host should be in which host group. With the attribute `blueprint` you can define the name of the blueprint. Then you can define the hosts of each host group. e.g. we define the host `phd1.localdomain` to be in `host_group_1` of `blueprint-c1` 
+> Tells Ambari which blueprint it shoud use and which host should be in which host group. With the attribute `blueprint` you can define the name of the blueprint. Then you can define the hosts of each host group. e.g. we define the host `phd1.localdomain` to be in `host_group_1` of `blueprint-c1` 
 
-Again several host mapping files are provided here: [2-node-simple-hostmapping.json](2-node-simple-hostmapping.json) and [4-node-all-services-hostmapping.json](4-node-all-services-hostmapping.json) (default) but you can build your own host mapping file and set the path via the [Vagrantfile](../Vagrantfile) `HOST_MAPPING_FILE_NAME`property. 
+Several predefined host-mapping files are provided: [2-node-simple-hostmapping.json](2-node-simple-hostmapping.json), [3-node-springxd-hostmapping.josn](3-node-springxd-hostmapping.json) and [4-node-all-services-hostmapping.json](4-node-all-services-hostmapping.json) (default). You can build your own host-mapping file and select it through the [Vagrantfile](../Vagrantfile) `HOST_MAPPING_FILE_NAME` property. 
 
-_Note: paths to the custom blueprints and host-mapping files has to be relative to the location of the Vagrantfile!_
+_Note: All custom `blueprints` and `host-mapping` files must be stored in the `/blueprints` subfolder!_
 
 #### Host Mapping Name Convention
 To simplify the Vagrantfile the follwoing hostname convention is enforced:
+
 * Ambari hostname - defaults to `ambari.localdomain`. You can override the `ambari` prefix via the [Vagrantfile](../Vagrantfile) `AMBARI_HOSTNAME_PREFIX`property. The domain is fixed to `.localdomain`. 
 * Cluster hostnames - cluster nodes are named like this: `phd<NodeIndex>.localdomain`. For a cluster with N nodes, the hostnames are: `phd1.localdomain` ... `phdN.localdomain`. Index starts from `1` and increments consequatively (**no gaps**) to N. `N` is the size of the cluster excluding the Ambari node.
 

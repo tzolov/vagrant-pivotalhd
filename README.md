@@ -32,5 +32,19 @@ https://10.211.55.100:8080
 ```
 (username: `admin`, password: `admin`)
 
+## User Configuration Properties
+
+| Property | Description | Default Value |
+| -------------------|------------------------------|-----|
+| BLUEPRINT_FILE_NAME | Specifies the Blueprint file name to deployed. File must exist in the /blueprints subfolder. | all-services-blueprint.json |
+| HOST_MAPPING_FILE_NAME | Specifies the related Host-Mapping file name to deployed. File must exist in the /blueprints subfolder. | 4-node-all-services-hostmapping.json |
+| CLUSTER_NAME | Sets the cluster name as it will apper in Ambari | PHD30C1 |
+| VM_BOX | Vagrant box name to use. Tested options are: (1) bigdata/centos6.4_x86_64 - 40G disk and (2) bigdata/centos6.4_x86_64_small - just 8G of disk space | bigdata/centos6.4_x86_64 |
+| AMBARI_NODE_VM_MEMORY_MB | Memory (MB) allocated for the Ambari VM  | 768 |
+| PHD_NODE_VM_MEMORY_MB |  Memory (MB) allocated for every PHD VM | 2048 |
+| AMBARI_HOSTNAME_PREFIX | Set the Ambari host name prefix. The suffix is fixed to '.localdomain'.Note: THE FQDN NAME SHOULD NOT be in the phd[1-N].localdomain range. | ambari |
+| DEPLOY_BLUEPRINT_CLUSTER | Set TRUE to deploy a cluster defined with BLUEPRINT_FILE_NAME and HOST_MAPPING_FILE_NAME. Set FALSE to stop the installation after the Aambari Server installation.   | TRUE |
+
+
 
 
