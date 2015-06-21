@@ -73,17 +73,17 @@ The [all-services-blueprint.json](all-services-blueprint.json) and [4-node-all-s
 		</tr>
 		<tr>
 			<td><sub>phd1.localadmin</sub></td>
-			<td><sub></sub></td>
+			<td><sub>nn_yarn_hive_hcat_workers_clients_group</sub></td>
 			<td><sub>HAWQ SMaster, NameNode, HiveServer2, Hive Metastore, ResourceManager, WebHCat Server, DataNode, HAWQ Segment, RegionServer, NodeManager, PXF</sub></td>
 		</tr>
 		<tr>
 			<td><sub>phd2.localadmin</sub></td>
-			<td><sub>nn_yarn_hive_hcat_workers_clients_group</sub></td>
+			<td><sub>hbase_hist_shawq_spring_xd_workers_clients_group</sub></td>
 			<td><sub>App Timeline Server, History Server, HBase Master, Oozie Server, SNameNode, DataNode, HAWQ Segment, RegionServer, NodeManager, PXF</sub></td>
 		</tr>		
 		<tr>
 			<td><sub>phd3.localadmin</sub></td>
-			<td><sub>hbase_hist_shawq_spring_xd_workers_clients_group</sub></td>
+			<td><sub>hawq_zk_snn_workers_clients_group</sub></td>
 			<td><sub>HAWQ Master, Zookeeper Server, DataNode, HAWQ Segment, RegionServer, NodeManager, PXF</sub></td>
 		</tr>		
 	</tbody>
