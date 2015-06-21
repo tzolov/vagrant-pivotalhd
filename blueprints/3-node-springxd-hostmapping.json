@@ -1,0 +1,20 @@
+{ 
+  "blueprint" : "springxd-hdfs-yarn-zk-hawq-blueprint",
+  "default_password" : "secret-password",
+  "host_groups" : [
+    { 
+      "name" : "management_group",
+      "hosts": [ { "fqdn":"ambari.localdomain" }  ] 
+    },
+    { 
+      "name" : "masters_group",
+      "hosts": [ { "fqdn":"phd1.localdomain" } ] 
+    },
+    { 
+      "name" : "standby_masters_group",	            
+      "hosts": [ { "fqdn":"phd2.localdomain" } ] 
+    }		 	
+  ] 
+}
+
+

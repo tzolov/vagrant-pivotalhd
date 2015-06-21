@@ -19,12 +19,13 @@ def getRepos():
     for repo in repos:
         url = str(repo["href"])
         repoID = str(repo["Repositories"]["repo_id"])
-        if repoID == "PHD-3.0":
-            repoID = "PHD-3.0.0.0"
-        payload = "{\"Repositories\": {\"base_url\": \"http://" + hostName + "/" + repoID + "/\" , \"verify_base_url\" :false}}"
-        print payload
-        test = requests.put(url, auth=auth, headers=headers, data=payload)
-        print test
+        if repoID != "Spring-XD-1.2":
+            if repoID == "PHD-3.0":
+                repoID = "PHD-3.0.0.0"
+            payload = "{\"Repositories\": {\"base_url\": \"http://" + hostName + "/" + repoID + "/\" , \"verify_base_url\" :false}}"
+            print payload
+            test = requests.put(url, auth=auth, headers=headers, data=payload)
+            print test
 if __name__ == '__main__':
     print "PHD3 Repo Setup"
     getRepos()

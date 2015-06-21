@@ -14,8 +14,7 @@ CLUSTER_NAME = "PHD30C1"
 # Provide the path to the blueprint file to use
 BLUEPRINT_FILE = "blueprints/all-phd3-hawq-services-blueprint.json"
 
-# Provide the path to the host-mapping file that uses the above blueprint 
-# to deploy the cluster
+# Provide the path to the host-mapping file that uses the above blueprint to deploy the cluster
 HOST_MAPPING_FILE = "blueprints/4-node-all-services-hostmapping.json"
 
 # Set the Ambari host name (THE FQDN NAME SHOULD NOT be in the phd[1-N].localdomain range)
@@ -46,8 +45,7 @@ print "CLUSTER: #{CLUSTER_NAME} \n"
 print "BLUEPRINT: #{BLUEPRINT_SPEC_NAME} \n"
 print "STACK: #{blueprint_spec['Blueprints']['stack_name']}-#{blueprint_spec['Blueprints']['stack_version']} \n"
 
-# Read the host-mapping file to extract the blueprint name and the 
-# cluster node hostnames
+# Read the host-mapping file to extract the blueprint name and the cluster node hostnames
 host_mapping = JSON.parse(open(HOST_MAPPING_FILE).read)
 
 # Extract the Blueprint name from the host mapping file
@@ -55,7 +53,7 @@ BLUEPRINT_NAME = host_mapping["blueprint"]
 
 # Validate that the Blueprint set in the host mapping file aligns with the name of the blueprint provided
 if (BLUEPRINT_SPEC_NAME != BLUEPRINT_NAME)
-	print "Blueprint in the host mapping file:(#{BLUEPRINT_NAME}) doesn't match  provided blueprint spec: (#{BLUEPRINT_SPEC_NAME})! \n"
+	print "Host-Mapping blueprint:(#{BLUEPRINT_NAME}) doesn't match Blueprint spec: (#{BLUEPRINT_SPEC_NAME})! \n"
 	exit
 end
 
@@ -105,13 +103,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end     	  
 
       phd_conf.vm.host_name = phd_host_name    
-      phd_conf.vm.network :private_network, ip: "10.211.55.#{i+100}"	  
+      phd_conf.vm.network :private_network, ip: "10.211.55.#{i + 100}"	  
 
       phd_conf.vm.provision "shell" do |s|
         s.path = "provision/prepare_host.sh"
-        s.args = [AMBARI_HOSTNAME_PREFIX, 
-                  AMBARI_HOSTNAME_FQDN, 
-                  NUMBER_OF_CLUSTER_NODES]
+        s.args = [AMBARI_HOSTNAME_PREFIX, AMBARI_HOSTNAME_FQDN, NUMBER_OF_CLUSTER_NODES]
       end 
 	  
       #Fix hostname FQDN
@@ -143,9 +139,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    # Initialization common for all nodes
    ambari.vm.provision "shell" do |s|
      s.path = "provision/prepare_host.sh"
-     s.args = [AMBARI_HOSTNAME_PREFIX, 
-               AMBARI_HOSTNAME_FQDN, 
-               NUMBER_OF_CLUSTER_NODES]
+     s.args = [AMBARI_HOSTNAME_PREFIX, AMBARI_HOSTNAME_FQDN, NUMBER_OF_CLUSTER_NODES]
    end
    
    # Install Ambari Server
@@ -165,11 +159,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    # Deploy Hadoop Cluster & Services
    ambari.vm.provision "shell" do |s|
      s.path = "provision/deploy_cluster.sh"
-	 s.args = [AMBARI_HOSTNAME_FQDN, 
-	           CLUSTER_NAME, 
-	           BLUEPRINT_NAME, 
-	           "/vagrant/" + BLUEPRINT_FILE, 
-	           "/vagrant/" + HOST_MAPPING_FILE]
+	   s.args = [AMBARI_HOSTNAME_FQDN, 
+	             CLUSTER_NAME, 
+	             BLUEPRINT_NAME, 
+	             "/vagrant/" + BLUEPRINT_FILE, 
+	             "/vagrant/" + HOST_MAPPING_FILE]
    end    
   end
 end

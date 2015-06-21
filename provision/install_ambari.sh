@@ -1,7 +1,7 @@
 #!/bin/bash
  
-# Install HTTPD service needed for the YUM repo
-yum -y install httpd
+# Install HTTPD service needed for the local YUM repo
+yum -y install httpd wget
 service httpd start
 
 # Prepare a folder to copy the installation tarballs
@@ -30,6 +30,9 @@ yum -y install ambari-server
 # Install the HAWQ Ambari plugin
 yum -y install /staging/hawq-plugin-phd-1.2-99/hawq-plugin-1.2-99.noarch.rpm
 
+wget -nv http://repo.spring.io/yum-release/spring-xd/1.2/spring-xd-1.2.repo -O /etc/yum.repos.d/spring-xd-1.2.repo
+yum -y install spring-xd-plugin-phd
+
 # Install JDK7 and Policty file
 cp /vagrant/packages/jdk-7u67-linux-x64.tar.gz /var/lib/ambari-server/resources/
 cp /vagrant/packages/UnlimitedJCEPolicyJDK7.zip /var/lib/ambari-server/resources/
@@ -56,6 +59,13 @@ pip install requests
 # Register the YUM repos with Ambari 
 # (Script is shamelessly borrowed from the Pivotal AWS project)
 python /vagrant/provision/SetRepos.py
+
+# Install and configure Redis server. Used for SpringXD transport
+yum -y install redis
+chkconfig redis on
+sudo sed -i "s/bind 127.0.0.1/#bind 127.0.0.1/g;" /etc/redis.conf
+service redis start
+
 
 #Install local Ambari Agent
 yum install -y ambari-agent

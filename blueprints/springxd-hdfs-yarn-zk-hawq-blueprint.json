@@ -1,0 +1,102 @@
+{
+  "Blueprints" : {
+    "stack_name" : "PHD",
+    "stack_version" : "3.0",
+    "blueprint_name": "springxd-hdfs-yarn-zk-hawq-blueprint"
+  },
+  
+  "configurations" : [
+    {
+      "nagios-env": {
+        "nagios_contact": "admin@localhost.com"
+      }
+    },
+    {
+      "hawq-site" : {
+        "hawq.master.port" : "5432",
+        "sysctl.vm.overcommit_memory" : "1"
+      }
+    },    
+    {
+      "springxd-site" : {
+        "hsql.server.port" : "9101",
+        "server.port" : "9393",
+        "spring.rabbitmq.addresses" : " ",
+        "spring.redis.host" : "ambari.localdomain",
+        "spring.redis.port" : "6379",
+        "xd.messagebus.kafka.brokers" : " ",
+        "xd.transport" : " redis"
+      }
+    }
+  ],
+  
+  "host_groups" : [
+    {
+      "name" : "management_group",
+      "configurations" : [ ],
+      "components" : [
+        {"name" : "AMBARI_SERVER"},
+        {"name" : "GANGLIA_SERVER"},
+		{"name" : "NAGIOS_SERVER"}, 
+		
+        {"name" : "ZOOKEEPER_CLIENT" },
+        {"name" : "SPRINGXDSHELL"},
+        {"name" : "HDFS_CLIENT"},
+        {"name" : "YARN_CLIENT"},
+        {"name" : "MAPREDUCE2_CLIENT"},
+        {"name" : "GANGLIA_MONITOR"} 		
+      ],
+      "cardinality" : "1"
+    },
+    {
+      "name" : "masters_group",
+      "configurations" : [ ],
+      "components" : [
+		{ "name" : "ZOOKEEPER_SERVER" },
+        { "name" : "SPRINGXDHSQL"},		
+        { "name" : "RESOURCEMANAGER"},
+        { "name" : "HISTORYSERVER"},
+        { "name" : "NAMENODE"},
+        { "name" : "SPRINGXDADMIN"},
+        { "name" : "APP_TIMELINE_SERVER"},
+        { "name" : "HAWQMASTER"},
+		
+        { "name" : "PXF"},
+        { "name" : "HAWQSEGMENT"},
+        { "name" : "NODEMANAGER"},
+        { "name" : "SPRINGXDCONTAINER"},
+        { "name" : "DATANODE"},
+		
+        {"name" : "ZOOKEEPER_CLIENT" },
+        {"name" : "SPRINGXDSHELL"},
+        {"name" : "HDFS_CLIENT"},
+        {"name" : "YARN_CLIENT"},
+        {"name" : "MAPREDUCE2_CLIENT"},
+        {"name" : "GANGLIA_MONITOR"} 				
+      ],
+      "cardinality" : "1"
+    },
+    {
+      "name" : "standby_masters_group",
+      "configurations" : [ ],
+      "components" : [
+        {"name" : "HAWQSTANDBY"},		
+  		{"name" : "SECONDARY_NAMENODE"},
+		
+        { "name" : "PXF"},
+        { "name" : "HAWQSEGMENT"},
+        { "name" : "NODEMANAGER"},
+        { "name" : "SPRINGXDCONTAINER"},
+        { "name" : "DATANODE"},
+		
+        {"name" : "ZOOKEEPER_CLIENT" },
+        {"name" : "SPRINGXDSHELL"},
+        {"name" : "HDFS_CLIENT"},
+        {"name" : "YARN_CLIENT"},
+        {"name" : "MAPREDUCE2_CLIENT"},
+        {"name" : "GANGLIA_MONITOR"} 		
+      ],
+      "cardinality" : "1"
+    }	
+  ]
+}
