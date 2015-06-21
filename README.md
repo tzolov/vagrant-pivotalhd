@@ -24,7 +24,7 @@ From the top directory run
 ```
 vagrant up --provider virtualbox
 ```
-Default [`blueprint/host-mapping`](https://github.com/tzolov/vagrant-pivotalhd/tree/master/blueprints#all-phd30-services-specification) will create 4 Virtual Machines (ambari.localdomain, phd1.localdomain, phd2.localdomain and ph3.localdomain) and will install Ambari server. Then the Ambari Blueprint REST API is used to deploy and launch the PHD/HAWQ cluster. 
+Default [`blueprint/host-mapping`](https://github.com/tzolov/vagrant-pivotalhd/tree/master/blueprints#all-services-specification) will create 4 Virtual Machines (ambari.localdomain, phd1.localdomain, phd2.localdomain and ph3.localdomain) and will install Ambari server. Then the Ambari Blueprint REST API is used to deploy and launch the PHD/HAWQ cluster. 
 
 When the `vagrant up` command completes (~10 min) the VMs are provisioned and the Ambari Server is installed. The cluster deployment is in progrees (~30 min) and you can use the Ambari Web UI to monitor the progress. For this open the ambari page in a browser:
 ```

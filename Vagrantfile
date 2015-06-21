@@ -13,9 +13,6 @@ require 'json'
 ###############################################################################
 # Edit the following parameters to configure your cluster deployment. 
 
-# Set the name of the cluster to be deployed
-CLUSTER_NAME = "PHD30C1"
-
 # Set the Blueprint file name that defines the cluster to be deployed. 
 # File must exist under the /blueprints subfolder!
 BLUEPRINT_FILE_NAME = "all-services-blueprint.json"
@@ -24,8 +21,8 @@ BLUEPRINT_FILE_NAME = "all-services-blueprint.json"
 # File must exist under the /blueprints subfolder!
 HOST_MAPPING_FILE_NAME = "4-node-all-services-hostmapping.json"
 
-# Set the Ambari host name (THE FQDN NAME SHOULD NOT be in the phd[1-N].localdomain range)
-AMBARI_HOSTNAME_PREFIX = "ambari"
+# Set the name of the cluster to be deployed
+CLUSTER_NAME = "PHD30C1"
 
 # Specify the Vagrant box name to use. Tested options are:
 # - bigdata/centos6.4_x86_64 - 40G disk space.
@@ -37,6 +34,10 @@ AMBARI_NODE_VM_MEMORY_MB = "768"
 
 # Set the memory (MB) allocated for every PHD node VM
 PHD_NODE_VM_MEMORY_MB = "2048"
+
+# Set the Ambari host name prefix. The suffix is fixed to '.localdomain'.
+# Note: THE FQDN NAME SHOULD NOT be in the phd[1-N].localdomain range.
+AMBARI_HOSTNAME_PREFIX = "ambari"
 
 # Set TRUE to deploy a cluster defined with BLUEPRINT_FILE_NAME and HOST_MAPPING_FILE_NAME.
 # Set FALSE to stop the installation after the Aambari Server installation. 
