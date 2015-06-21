@@ -1,6 +1,8 @@
-Build multi-VMs PivotalHD3.0/HAWQ/SpringXD cluster
+Build multi-VMs PivotalHD30/HAWQ/SpringXD cluster
 =================
 This project leverages Vagrant and [Apache Ambari](https://ambari.apache.org/) to install multi-VMs [PivotalHD 3.0](http://pivotal.io/big-data/pivotal-hd) Hadoop cluster including [HAWQ 1.3 (SQL on Hadoop)](http://pivotal.io/big-data/pivotal-hawq) and [Spring XD 1.2](http://projects.spring.io/spring-xd/).
+
+![alt text](doc/VAGRANT_AMBARI_PHD3_HAWQ_SPRINGXD.png "Ambari with Vagrant")
 
 The logical structure of the cluster is defined in a [`Blueprint`](blueprints). Related [`Host-Mapping`](blueprints) defines how the blueprint is mapped into physical machines. The [Vagrantfile](Vagrantfile) script provisions Virtual Machines (VMs) for the hosts defined in the `Host-Mapping` and with the help of the [Ambari Blueprint API](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints) deploys the`Blueprint` in the cluster. 
 
