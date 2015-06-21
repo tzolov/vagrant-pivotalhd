@@ -1,8 +1,8 @@
-Vagrant and Ambari Blueprints to build PivotalHD3.0/HAWQ cluster
+Vagrant and Ambari Blueprint API to build PivotalHD3.0/HAWQ cluster
 =================
 Vagrant scripts that leverage [Apache Ambari](https://ambari.apache.org/) to install [PivotalHD 3.0](http://pivotal.io/big-data/pivotal-hd) Hadoop along with [HAWQ 1.3 (SQL on Hadoop)](http://pivotal.io/big-data/pivotal-hawq) and [Spring XD](http://projects.spring.io/spring-xd/).
 
-The Vagrant scripts uses Ambari Blueprint API to specify and deploy the cluster. The logical structure of the cluster is defined in a [`Blueprint`](blueprints) while the [`Host-Mapping`](blueprints) specification defines how a blueprint is mapped into physical machines. The Vagrant script provisions Virtual Machines (VMs) for the hosts defined in the `Host-Mapping` and then uses the Ambari API to deploys the cluster blueprint. 
+The Vagrant scripts uses [Ambari Blueprint API](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints) to specify and deploy the cluster. The logical structure of the cluster is defined in a [`Blueprint`](blueprints) while the [`Host-Mapping`](blueprints) specification defines how a blueprint is mapped into physical machines. The Vagrant script provisions Virtual Machines (VMs) for the hosts defined in the `Host-Mapping` and then uses the Ambari API to deploys the cluster blueprint. 
 
 > After hardware is available and software packages are downloaded, there is a Vagrant-based, single-command install process that will set-up either VMware Fusion VMs or VirtualBox VMs by default with CentOS. 
 Default blueprint creates four virtual machines  — one for the Apache Ambari and three for the Pivotal HD cluster where Apache Hadoop® (HDFS, YARN, Pig, Zookeeper, HBase), HAWQ (SQL-on-HDFS analytic data warehouse)
