@@ -17,7 +17,7 @@ The default [All-Services-Blueprint](blueprints/all-services-blueprint.json) cre
 git clone https://github.com/tzolov/vagrant-pivotalhd.git
 ```
 * Follow the [Packages download](https://github.com/tzolov/vagrant-pivotalhd/tree/master/packages) instructions to collect all required tarballs and store them inside the `/packages` subfolder.
-* Edit the  [Vagrantfile](Vagrantfile) `BLUEPRINT_FILE_NAME` and `HOST_MAPPING_FILE_NAME` properties to select the `Blueprint`/`Host-Mapping` pair to deploy. All blueprints and mapping files are in the [`/blueprint`](blueprints) subfolder. The default blueprint is the [4 nodes, All-Services](https://github.com/tzolov/vagrant-pivotalhd/tree/master/blueprints#all-services-specification) blueprint.
+* Edit the  [Vagrantfile](Vagrantfile) `BLUEPRINT_FILE_NAME` and `HOST_MAPPING_FILE_NAME` properties to select the `Blueprint`/`Host-Mapping` pair to deploy. All blueprints and mapping files are in the [`/blueprint`](blueprints) subfolder. By default the [4 nodes, All-Services](https://github.com/tzolov/vagrant-pivotalhd/tree/master/blueprints#all-services-specification) blueprint is used.
 
 ## Create Pivotal HD cluster
 From the top directory run
