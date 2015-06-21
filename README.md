@@ -1,4 +1,4 @@
-User Vagrant and Ambari Blueprint API to build PivotalHD3.0/HAWQ multi-VMs cluster
+Vagrant and Ambari Blueprint API to build PivotalHD3.0/HAWQ/SpringXD multi-VMs cluster
 =================
 This project leverages Vagrant and [Apache Ambari](https://ambari.apache.org/) to install multi-VMs [PivotalHD 3.0](http://pivotal.io/big-data/pivotal-hd) Hadoop cluster including [HAWQ 1.3 (SQL on Hadoop)](http://pivotal.io/big-data/pivotal-hawq) and [Spring XD 1.2](http://projects.spring.io/spring-xd/).
 
