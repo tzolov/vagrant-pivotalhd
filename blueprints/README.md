@@ -37,7 +37,7 @@ Combination of [hdfs-hawq-only-blueprint.json](hdfs-hawq-only-blueprint.json) an
 | phd1.localadmin | NameNode, DataNode, HAWQ Segment, PXF, HAWQ Master |
 
 ###### All PHD3.0 services specification. 
-The [springxd-hdfs-yarn-zk-hawq-blueprint.json](springxd-hdfs-yarn-zk-hawq-blueprint.json) and [4-node-all-services-hostmapping.json](4-node-all-services-hostmapping.json) spec defines a 4 node cluster with the following layout:
+The [all-phd3-hawq-services-blueprint.json](all-phd3-hawq-services-blueprint.json) and [4-node-all-services-hostmapping.json](4-node-all-services-hostmapping.json) spec defines a 4 node cluster with the following layout:
 
 | Host name | Services |
 | -------------------|------------------------------|
@@ -47,7 +47,7 @@ The [springxd-hdfs-yarn-zk-hawq-blueprint.json](springxd-hdfs-yarn-zk-hawq-bluep
 | phd3.localadmin | HAWQ Master, , Zookeeper Server, DataNode, HAWQ Segment, RegionServer, NodeManager, PXF |
 
 ###### SpringXD, YARN, HDFS, HAWQ Blueprint. 
-The [all-phd3-hawq-services-blueprint.json](all-phd3-hawq-services-blueprint.json) and [3-node-springxd-hostmapping.json](3-node-springxd-hostmapping.json) spec defines a 3 node cluster with the following layout:
+The [springxd-hdfs-yarn-zk-hawq-blueprint.json](springxd-hdfs-yarn-zk-hawq-blueprint.json) and [3-node-springxd-hostmapping.json](3-node-springxd-hostmapping.json) spec defines a 3 node cluster with the following layout:
 
 | Host name | Services |
 | -------------------|------------------------------|
