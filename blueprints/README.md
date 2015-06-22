@@ -10,18 +10,17 @@ The [Using Ambari Blueprints](https://blog.codecentric.de/en/2014/05/lambda-clus
 ###### Blueprints
 > defines the logical structure of a cluster, without needing informations about the actual infrastructure. Therefore you can use the same blueprint for different amount of nodes, different IPs and different domain names.
 
-Couple of predefined blueprints are provided in the [Predefined Blueprints and Host Mapptings](##-Predefined-Blueprints-and Host-Mapptings) section, but can create your own blueprint file and select it through the [Vagrantfile](../Vagrantfile) `BLUEPRINT_FILE_NAME` property. 
+Couple of predefined blueprints are provided in the [Predefined Blueprints and Host Mapptings](#predefined-blueprints-and-host-mapptings) section, but can create your own blueprint file and select it through the [Vagrantfile](../Vagrantfile) `BLUEPRINT_FILE_NAME` property. 
 
 ###### Host Mapping
 > Tells Ambari which blueprint it shoud use and which host should be in which host group. With the attribute `blueprint` you can define the name of the blueprint. Then you can define the hosts of each host group. e.g. we define the host `phd1.localdomain` to be in `host_group_1` of `blueprint-c1` 
 
-Several predefined host-mapping files are provided in the [Predefined Blueprints and Host Mapptings](##-Predefined-Blueprints-and Host-Mapptings). You can build your own host-mapping file and select it through the [Vagrantfile](../Vagrantfile) `HOST_MAPPING_FILE_NAME` property. 
+Several predefined host-mapping files are provided in the [Predefined Blueprints and Host Mapptings](#predefined-blueprints-and-host-mapptings). You can build your own host-mapping file and select it through the [Vagrantfile](../Vagrantfile) `HOST_MAPPING_FILE_NAME` property. 
 
 ###### Stacks
 Currently the following stacks are supported: 
-* PHD3.0 - PivotalHD 3.0 + Ambari 1.7
-* HDP2.2 - Hortonworks 2.2 + Ambari 2.0.1
-
+* PHD3.0 - PivotalHD 3.0, Ambari 1.7
+* HDP2.2 - Hortonworks 2.2, Ambari 2.0.1
 _Note: All custom `blueprints` and `host-mapping` files must be stored in the `/blueprints` subfolder!_
 
 #### Host Mapping Name Convention
