@@ -1,10 +1,10 @@
-Build multi-VMs PivotalHD30/HAWQ/SpringXD cluster
+Multi-VMs PivotalHD3.0 (or Hortonworks HDP2.x) Hadoop Cluster with HAWQ and SpringXD
 =================
-This project leverages Vagrant and [Apache Ambari](https://ambari.apache.org/) to install multi-VMs [PivotalHD 3.0](http://pivotal.io/big-data/pivotal-hd) Hadoop cluster including [HAWQ 1.3 (SQL on Hadoop)](http://pivotal.io/big-data/pivotal-hawq) and [Spring XD 1.2](http://projects.spring.io/spring-xd/).
+This project leverages Vagrant and [Apache Ambari](https://ambari.apache.org/) to create multi-VMs [PivotalHD 3.0](http://pivotal.io/big-data/pivotal-hd) or Hortonworks HDP2.x Hadoop cluster including [HAWQ 1.3 (SQL on Hadoop)](http://pivotal.io/big-data/pivotal-hawq) and [Spring XD 1.2](http://projects.spring.io/spring-xd/).
 
 ![alt text](doc/VAGRANT_AMBARI_PHD3_HAWQ_SPRINGXD.png "Ambari with Vagrant")
 
-The logical structure of the cluster is defined in a [`Blueprint`](blueprints). Related [`Host-Mapping`](blueprints) defines how the blueprint is mapped into physical machines. The [Vagrantfile](Vagrantfile) script provisions Virtual Machines (VMs) for the hosts defined in the `Host-Mapping` and with the help of the [Ambari Blueprint API](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints) deploys the`Blueprint` in the cluster. 
+The logical structure of the cluster is defined in a [`Blueprint`](blueprints). Related [`Host-Mapping`](blueprints) defines how the blueprint is mapped into physical machines. The [Vagrantfile](Vagrantfile) script provisions Virtual Machines (VMs) for the hosts defined in the `Host-Mapping` and with the help of the [Ambari Blueprint API](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints) deploys the`Blueprint` in the cluster. Vagrant supports PivotalHD3.0 (`PHD`) and Hortonworks 2.x (`HDP`) blueprint stacks. 
 
 The default [All-Services-Blueprint](blueprints/all-services-blueprint.json) creates four virtual machines  — one for Apache Ambari and three for the Pivotal HD cluster where Apache Hadoop® (HDFS, YARN, Pig, Zookeeper, HBase), HAWQ (SQL-on-Hadoop) and SpringXD are installed.
 
@@ -21,13 +21,12 @@ git clone https://github.com/tzolov/vagrant-pivotalhd.git
 * Follow the [Packages download](https://github.com/tzolov/vagrant-pivotalhd/tree/master/packages) instructions to collect all required tarballs and store them inside the `/packages` subfolder.
 * Edit the  [Vagrantfile](Vagrantfile) `BLUEPRINT_FILE_NAME` and `HOST_MAPPING_FILE_NAME` properties to select the `Blueprint`/`Host-Mapping` pair to deploy. All blueprints and mapping files are in the [`/blueprint`](blueprints) subfolder. By default the [4 nodes, All-Services](https://github.com/tzolov/vagrant-pivotalhd/tree/master/blueprints#all-phd30-services-specification) blueprint is used.
 
-## Create Pivotal HD cluster
+## Create Hadoop cluster
 From the top directory run
 ```
 vagrant up --provider virtualbox
 ```
-
-The default [`blueprint/host-mapping`](https://github.com/tzolov/vagrant-pivotalhd/tree/master/blueprints#all-phd30-services-specification) will create 4 Virtual Machines. 
+Depnends on the bluprint stack either PivotalHD or Hortonworks clusters will be created. The default [`blueprint/host-mapping`](https://github.com/tzolov/vagrant-pivotalhd/tree/master/blueprints#all-phd30-services-specification) will create 4 Virtual Machines. 
 When the `vagrant up` command reutrns, the VMs are provisioned, the Ambari Server is installed and the cluster deployment is in progrees. Open the Ambari interface to monitor the deployment progress:
 ```
 https://10.211.55.100:8080
