@@ -10,12 +10,17 @@ The [Using Ambari Blueprints](https://blog.codecentric.de/en/2014/05/lambda-clus
 ###### Blueprints
 > defines the logical structure of a cluster, without needing informations about the actual infrastructure. Therefore you can use the same blueprint for different amount of nodes, different IPs and different domain names.
 
-To get you started a couple of predefined blueprints are provided: [hdfs-hawq-only-blueprint.json](hdfs-hawq-only-blueprint.json), [springxd-hdfs-yarn-zk-hawq-blueprint.json](springxd-hdfs-yarn-zk-hawq-blueprint.json) and [all-services-blueprint.json](all-services-blueprint.json) (default). You can create your own blueprint and select it through the [Vagrantfile](../Vagrantfile) `BLUEPRINT_FILE_NAME` property. 
+Couple of predefined blueprints are provided in the [Predefined Blueprints and Host Mapptings](##-Predefined-Blueprints-and Host-Mapptings) section, but can create your own blueprint file and select it through the [Vagrantfile](../Vagrantfile) `BLUEPRINT_FILE_NAME` property. 
 
 ###### Host Mapping
 > Tells Ambari which blueprint it shoud use and which host should be in which host group. With the attribute `blueprint` you can define the name of the blueprint. Then you can define the hosts of each host group. e.g. we define the host `phd1.localdomain` to be in `host_group_1` of `blueprint-c1` 
 
-Several predefined host-mapping files are provided: [2-node-simple-hostmapping.json](2-node-simple-hostmapping.json), [3-node-springxd-hostmapping.josn](3-node-springxd-hostmapping.json) and [4-node-all-services-hostmapping.json](4-node-all-services-hostmapping.json) (default). You can build your own host-mapping file and select it through the [Vagrantfile](../Vagrantfile) `HOST_MAPPING_FILE_NAME` property. 
+Several predefined host-mapping files are provided in the [Predefined Blueprints and Host Mapptings](##-Predefined-Blueprints-and Host-Mapptings). You can build your own host-mapping file and select it through the [Vagrantfile](../Vagrantfile) `HOST_MAPPING_FILE_NAME` property. 
+
+###### Stacks
+Currently the following stacks are supported: 
+* PHD3.0 - PivotalHD 3.0 + Ambari 1.7
+* HDP2.2 - Hortonworks 2.2 + Ambari 2.0.1
 
 _Note: All custom `blueprints` and `host-mapping` files must be stored in the `/blueprints` subfolder!_
 
@@ -27,11 +32,12 @@ To simplify the Vagrantfile the follwoing hostname convention is enforced:
 
 Follow this convention in your **Host Mapping** specs or Vagrantfile will not be able to provision the required VMs. If you alter the Ambari name make shure it does not overlap with any of the cluster node names. 
 
-## Predefined Bluprints/Host Mapptings
+## Predefined Blueprints and Host Mapptings
 
-###### Simple HDFS + HAWQ specification. 
-Combination of [hdfs-hawq-only-blueprint.json](hdfs-hawq-only-blueprint.json) and [2-node-simple-hostmapping.json](2-node-simple-hostmapping.json) denfine a 2 node cluster with the following layout:
+#### Pivotal HD3.0, Ambari 1.7 Blueprints
 
+###### HDFS and HAWQ Blueprint 
+The [phd-hdfs-hawq-blueprint.json](phd-hdfs-hawq-blueprint.json),  [2-node-hdfs-hawq-blueprint-hostmapping.json](2-node-hdfs-hawq-blueprint-hostmapping.json) pair defines a two node cluster with the following layout:
 <table>
 	<thead>
 		<tr>
@@ -54,9 +60,8 @@ Combination of [hdfs-hawq-only-blueprint.json](hdfs-hawq-only-blueprint.json) an
 	</tbody>
 </table>	
 
-###### All PHD3.0 services specification. 
-The [all-services-blueprint.json](all-services-blueprint.json) and [4-node-all-services-hostmapping.json](4-node-all-services-hostmapping.json) spec defines a 4 node cluster with the following layout:
-
+###### All services: PivotalHD3.0, HAWQ and SpringXD. 
+The [phd-all-services-blueprint.json](phd-all-services-blueprint.json) and [4-node-all-services-hostmapping.json](4-node-all-services-hostmapping.json) spec defines a 4 node cluster with the following layout:
 <table>
 	<thead>
 		<tr>
@@ -91,8 +96,7 @@ The [all-services-blueprint.json](all-services-blueprint.json) and [4-node-all-s
 
 
 ###### SpringXD, YARN, HDFS, HAWQ Blueprint. 
-The [springxd-hdfs-yarn-zk-hawq-blueprint.json](springxd-hdfs-yarn-zk-hawq-blueprint.json) and [3-node-springxd-hostmapping.json](3-node-springxd-hostmapping.json) spec defines a 3 node cluster with the following layout:
-
+The [phd-springxd-hdfs-yarn-zk-hawq-blueprint.json](phd-springxd-hdfs-yarn-zk-hawq-blueprint.json) and [3-node-springxd-hdfs-yarn-zk-hawq-blueprint-hostmapping.json](3-node-springxd-hdfs-yarn-zk-hawq-blueprint-hostmapping.json) spec defines a 3 node cluster with the following layout:
 <table>
 	<thead>
 		<tr>
@@ -120,6 +124,31 @@ The [springxd-hdfs-yarn-zk-hawq-blueprint.json](springxd-hdfs-yarn-zk-hawq-bluep
 	</tbody>
 </table>
 
+#### Hortonworks HDP2.2, Ambari-2.0 Blueprints
+
+###### SpringXD, YARN, HDFS Blueprint. 
+The [hdp-hdfs-yarn-springxd-zk-blueprint.json](hdp-hdfs-yarn-springxd-zk-blueprint.json) and [3-node-springxd-hdfs-yarn-zk-hawq-blueprint-hostmapping.json](3-node-springxd-hdfs-yarn-zk-hawq-blueprint-hostmapping.json) spec defines a 2 node cluster with the following layout:
+<table>
+	<thead>
+		<tr>
+			<th><sub>Host name</sub></th>
+			<th><sub>Host Group</sub></th>
+			<th><sub>Components</sub></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><sub>ambari.localadmin</sub></td>
+			<td><sub>management_group</sub></td>
+			<td><sub>Ambari, SNameNode</sub></td>
+		</tr>
+		<tr>
+			<td><sub>phd1.localadmin</sub></td>
+			<td><sub>masters_group</sub></td>
+			<td><sub>App Timeline Server, History Server, NameNode, ResourceManager, SpringXdAdmin, SpringXdHsql, DataNode, NodeManager, SpringXdContainer, Zookeeper Server, Metrics Collector</sub></td>
+		</tr>
+	</tbody>
+</table>
 
 #### References 
 * [Ambari Blueprints API](https://cwiki.apache.org/confluence/display/AMBARI/Blueprints)
