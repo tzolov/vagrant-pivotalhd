@@ -2,7 +2,7 @@
   "Blueprints" : {
     "stack_name" : "PHD",
     "stack_version" : "3.0",
-    "blueprint_name": "hdfs-hawq-only-blueprint"
+    "blueprint_name": "hdfs-hawq-blueprint"
   },
   
   "configurations" : [    

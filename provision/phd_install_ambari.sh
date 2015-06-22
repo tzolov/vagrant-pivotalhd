@@ -1,8 +1,21 @@
 #!/bin/bash
+
+# Add SSH passwordless keys
+cp /vagrant/id_dsa.pub /home/vagrant/.ssh/
+cp /vagrant/id_dsa /home/vagrant/.ssh/
+chown vagrant:vagrant /home/vagrant/.ssh/id_dsa*
+chmod 400 /home/vagrant/.ssh/id_dsa
+cat /vagrant/id_dsa.pub | cat >> ~/.ssh/authorized_keys
+
+# Install EPEL repository. Required by the pip (SetRepo.py) and SpringXD
+rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm      
  
 # Install HTTPD service needed for the local YUM repo
-yum -y install httpd wget
+yum -y install httpd wget python-pip
 service httpd start
+
+# Required by the python scripts.
+pip install requests
 
 # Prepare a folder to copy the installation tarballs
 mkdir /staging
@@ -16,29 +29,24 @@ tar -xvzf /vagrant/packages/PADS-1.3.0.2-14421-rhel5_x86_64.tar.gz -C /staging/
 tar -xvzf /vagrant/packages/hawq-plugin-phd-1.2-99.tar.gz -C /staging/
 
 # Setup internal YUM repositories for the installation packages
-/staging/AMBARI-1.7.1/setup_repo.sh 
-/staging/PHD-3.0.0.0/setup_repo.sh 
-/staging/PHD-UTILS-1.1.0.20/setup_repo.sh 
-/staging/PADS-1.3.0.2/setup_repo.sh  
-/staging/hawq-plugin-phd-1.2-99/setup_repo.sh 
+for f in /staging/**/setup_repo.sh
+do
+ $f
+done
 
-# Setup the SpringXD external YUM repository
+# Setup the Remote SpringXD YUM repository
 wget -nv http://repo.spring.io/yum-release/spring-xd/1.2/spring-xd-1.2.repo -O /etc/yum.repos.d/spring-xd-1.2.repo
 
-# yum --enablerepo=hawq-plugin-phd-1.0-57 clean metadata
-
-# Install the Ambari Server
+# Install the Ambari Server and Plugins
 yum -y install ambari-server
-
-# Install the HAWQ Ambari plugin
-yum -y install /staging/hawq-plugin-phd-1.2-99/hawq-plugin-1.2-99.noarch.rpm
-
-# Install the SpringXD Ambari plugin
-yum -y install spring-xd-plugin-phd
 
 # Copy the JDK7 and the Policty tarballs into Ambari's resouces folder
 cp /vagrant/packages/jdk-7u67-linux-x64.tar.gz /var/lib/ambari-server/resources/
 cp /vagrant/packages/UnlimitedJCEPolicyJDK7.zip /var/lib/ambari-server/resources/
+
+# Install Ambari Plugins
+yum -y install /staging/hawq-plugin-phd-1.2-99/hawq-plugin-1.2-99.noarch.rpm
+yum -y install spring-xd-plugin-phd
 
 # Set nagios credentials nagiosadmin/admin
 htpasswd -c -b  /etc/nagios/htpasswd.users nagiosadmin admin
@@ -47,33 +55,15 @@ htpasswd -c -b  /etc/nagios/htpasswd.users nagiosadmin admin
 ambari-server setup -s
 ambari-server start
 
-# Add SSH passwordless keys
-cp /vagrant/id_dsa.pub /home/vagrant/.ssh/
-cp /vagrant/id_dsa /home/vagrant/.ssh/
-chown vagrant:vagrant /home/vagrant/.ssh/id_dsa*
-chmod 400 /home/vagrant/.ssh/id_dsa
-cat /vagrant/id_dsa.pub | cat >> ~/.ssh/authorized_keys
+# Register the YUM repos with Ambari (shamelessly borrowed from the Pivotal AWS project)
+AMBARI_HOSTNAME=ambari.localdomain
+STACK_NAME=PHD
+STACK_VERSION=3.0
+python /vagrant/provision/SetRepos.py $STACK_NAME $STACK_VERSION
 
-# Install python-pip and python's 'requests' modules (Needed by the SetRepos script)
-rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm      
-yum -y install python-pip
-pip install requests
+# List registered repos
+curl --user admin:admin -H 'X-Requested-By:ambari' -X GET http://$AMBARI_HOSTNAME:8080/api/v1/stacks/$STACK_NAME/versions/$STACK_VERSION/operating_systems/redhat6/repositories
 
-# Register the YUM repos with Ambari 
-# Expected local YUM urls
-# http://ambari.localdomain/AMBARI-1.7.1
-# http://ambari.localdomain/PHD-3.0.0.0
-# http://ambari.localdomain/PHD-UTILS-1.1.0.20
-# http://ambari.localdomain/PADS-1.3.0.0
-# http://repo.spring.io/yum-release/spring-xd/1.2
-# (This script is shamelessly borrowed from the Pivotal AWS project)
-python /vagrant/provision/SetRepos.py
-
-# Install Redis server. Used as SpringXD transport.
-yum -y install redis
-chkconfig redis on
-sudo sed -i "s/bind 127.0.0.1/#bind 127.0.0.1/g;" /etc/redis.conf
-service redis start
 
 #Install local Ambari Agent
 yum install -y ambari-agent

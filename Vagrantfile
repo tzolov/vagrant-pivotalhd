@@ -15,10 +15,12 @@ require 'json'
 
 # Set the Blueprint file name that defines the cluster to be deployed. 
 # File must exist under the /blueprints subfolder!
-BLUEPRINT_FILE_NAME = "all-services-blueprint.json"
+# Sample HDP blueprint: BLUEPRINT_FILE_NAME = "hdp-hdfs-yarn-springxd-zk-blueprint.json"
+BLUEPRINT_FILE_NAME = "phd-all-services-blueprint.json"
 
 # Set the Host-Mapping file name that maps the above Blueprint into physical nodes. 
 # File must exist under the /blueprints subfolder!
+# Sample HDP host mapping: HOST_MAPPING_FILE_NAME = "2-node-hdfs-yarn-springxd-zk-blueprint-hostmapping.json"
 HOST_MAPPING_FILE_NAME = "4-node-all-services-hostmapping.json"
 
 # Set the name of the cluster to be deployed
@@ -46,28 +48,37 @@ DEPLOY_BLUEPRINT_CLUSTER = TRUE
 ###############################################################################
 #    DON'T CHANGE THE CONTENT BELOW
 ###############################################################################
+# Maps provisioning script to the supported stack
+INSTALL_AMBARI_STACK = {
+  "PHD" => "provision/phd_install_ambari.sh",
+  "HDP" => "provision/hdp_install_ambari.sh"
+}
 
 # Create an Ambari FQDN hostname from the prefix and the localdomain domain. 
 AMBARI_HOSTNAME_FQDN = "#{AMBARI_HOSTNAME_PREFIX}.localdomain"
 
 # Parse the blueprint spec
 blueprint_spec = JSON.parse(open("blueprints/" + BLUEPRINT_FILE_NAME).read)
-BLUEPRINT_SPEC_NAME = blueprint_spec["Blueprints"]["blueprint_name"]
+BLUEPRINT_NAME = blueprint_spec["Blueprints"]["blueprint_name"]
+STACK_NAME = blueprint_spec['Blueprints']['stack_name']
+STACK_VERSION = blueprint_spec['Blueprints']['stack_version']
+AMBARI_PROVISION_SCRIPT = INSTALL_AMBARI_STACK[STACK_NAME]
 
 # Print deployment info
-print "CLUSTER NAME: #{CLUSTER_NAME} \nBLUEPRINT NAME: #{BLUEPRINT_SPEC_NAME} \n"
+print "CLUSTER NAME: #{CLUSTER_NAME} \nBLUEPRINT NAME: #{BLUEPRINT_NAME} \n"
 print "STACK: #{blueprint_spec['Blueprints']['stack_name']}-#{blueprint_spec['Blueprints']['stack_version']} \n"
 print "BLUEPRINT FILE: #{BLUEPRINT_FILE_NAME} \nHOST-MAPPING FILE: #{HOST_MAPPING_FILE_NAME} \n"
+print "Ambari Provision Script: #{AMBARI_PROVISION_SCRIPT}\n"
 
 # Read the host-mapping file to extract the blueprint name and the cluster node hostnames
 host_mapping = JSON.parse(open("blueprints/" + HOST_MAPPING_FILE_NAME).read)
 
 # Extract the Blueprint name from the host mapping file
-BLUEPRINT_NAME = host_mapping["blueprint"]
+HOST_MAPPING_BLUEPRINT_NAME = host_mapping["blueprint"]
 
 # Validate that the Blueprint set in the host mapping file aligns with the name of the blueprint provided
-if (BLUEPRINT_SPEC_NAME != BLUEPRINT_NAME)
-  print "Host-Mapping blueprint name:(#{BLUEPRINT_NAME}) doesn't match the Blueprint: (#{BLUEPRINT_SPEC_NAME})! \n"
+if (BLUEPRINT_NAME != HOST_MAPPING_BLUEPRINT_NAME)
+  print "Host-Mapping blueprint name:(#{HOST_MAPPING_BLUEPRINT_NAME}) doesn't match the Blueprint: (#{BLUEPRINT_NAME})! \n"
   exit
 end
 
@@ -153,7 +164,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    
    # Install Ambari Server
    ambari.vm.provision "shell" do |s|
-     s.path = "provision/install_ambari.sh"
+     s.path = AMBARI_PROVISION_SCRIPT
+   end 
+
+   # Install Redis (Used as Spring XD transport)
+   ambari.vm.provision "shell" do |s|
+     s.path = "provision/install_redis.sh"
    end 
 
    # Register the Ambari Agents and all nodes
@@ -166,7 +182,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    ambari.vm.provision :shell, :inline => "hostname " + AMBARI_HOSTNAME_FQDN
 
    # Deploy Hadoop Cluster & Services as defined in the Blueprint/Host-Mapping files
-   if (DEPLOY_BLUEPRINT_CLUSTER) 
+   if (DEPLOY_BLUEPRINT_CLUSTER)      
      ambari.vm.provision "shell" do |s|
        s.path = "provision/deploy_cluster.sh"
        s.args = [AMBARI_HOSTNAME_FQDN, CLUSTER_NAME, BLUEPRINT_NAME, 
