@@ -14,16 +14,7 @@
     {
       "hawq-site" : {
         "hawq.cluster.name" : "HAWQ",
-        "hawq.data.directory" : "/data/hawq/segments",
-        "hawq.master.directory" : "/data/hawq/master",
-        "hawq.master.keytab.file" : "/etc/security/keytabs/hawq.service.keytab",
         "hawq.master.port" : "5532",
-        "hawq.segment.base.port" : "40000",
-        "hawq.segments.per.node" : "4",
-        "hawq.temp.directory" : " ",
-        "hawq.user.password" : "gpadmin",
-        "set.os.parameters" : "true",
-        "skip.preinstall.verification" : "true",
         "sysctl.vm.overcommit_memory" : "1"
       }
     }

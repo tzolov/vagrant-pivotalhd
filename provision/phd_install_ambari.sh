@@ -56,9 +56,9 @@ ambari-server setup -s
 ambari-server start
 
 # Register the YUM repos with Ambari (shamelessly borrowed from the Pivotal AWS project)
-AMBARI_HOSTNAME=ambari.localdomain
-STACK_NAME=PHD
-STACK_VERSION=3.0
+AMBARI_HOSTNAME="ambari.localdomain"
+STACK_NAME="PHD"
+STACK_VERSION="3.0"
 python /vagrant/provision/SetRepos.py $STACK_NAME $STACK_VERSION
 
 # List registered repos

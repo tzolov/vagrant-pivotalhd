@@ -1,5 +1,5 @@
 { 
-  "blueprint" : "hdfs-hawq-only-blueprint",
+  "blueprint" : "hdfs-hawq-blueprint",
   "default_password" : "secret-password",
   "host_groups" : [
     { 
