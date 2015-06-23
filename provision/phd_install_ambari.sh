@@ -55,6 +55,12 @@ htpasswd -c -b  /etc/nagios/htpasswd.users nagiosadmin admin
 ambari-server setup -s
 ambari-server start
 
+# Check the availability of the PHD3.0 Stack
+curl --user admin:admin -H 'X-Requested-By:ambari' -X GET http://ambari.localdomain:8080/api/v1/stacks/PHD/versions/3.0
+
+# Give Ambari Server few seconds before start using the RSET API
+sleep 5
+
 # Register the YUM repos with Ambari (shamelessly borrowed from the Pivotal AWS project)
 python /vagrant/provision/SetRepos.py PHD 3.0
 # List registered repos
