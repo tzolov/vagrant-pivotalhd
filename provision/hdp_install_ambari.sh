@@ -53,14 +53,17 @@ yum -y install spring-xd-plugin-hdp
 ambari-server setup -s
 ambari-server start
 
+# Check the availability of the PHD3.0 Stack
+curl --user admin:admin -H 'X-Requested-By:ambari' -X GET http://ambari.localdomain:8080/api/v1/stacks/HDP/versions/2.2
+
+# Give Ambari Server few seconds before start using the RSET API
+sleep 5
+
 # Register the YUM repos with Ambari (shamelessly borrowed from the Pivotal AWS project)
-AMBARI_HOSTNAME="ambari.localdomain"
-STACK_NAME="HDP"
-STACK_VERSION="2.2"
-python /vagrant/provision/SetRepos.py $STACK_NAME $STACK_VERSION
+python /vagrant/provision/SetRepos.py HDP 2.2
 
 # List registered repos
-curl --user admin:admin -H 'X-Requested-By:ambari' -X GET http://$AMBARI_HOSTNAME:8080/api/v1/stacks/$STACK_NAME/versions/$STACK_VERSION/operating_systems/redhat6/repositories
+curl --user admin:admin -H 'X-Requested-By:ambari' -X GET http://ambari.localdomain:8080/api/v1/stacks/HDP/versions/2.2/operating_systems/redhat6/repositories
 
 #Install local Ambari Agent
 yum install -y ambari-agent
