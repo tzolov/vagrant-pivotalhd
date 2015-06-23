@@ -29,7 +29,7 @@ vagrant up --provider virtualbox
 Depends on the blueprint stack either PivotalHD or Hortonworks clusters will be created. The default [`blueprint/host-mapping`](blueprints#all-services-pivotalhd30-hawq-and-springxd) will create 4 Virtual Machines. 
 When the `vagrant up` command returns, the VMs are provisioned, the Ambari Server is installed and the cluster deployment is in progress. Open the Ambari interface to monitor the deployment progress:
 ```
-https://10.211.55.100:8080
+http://10.211.55.100:8080
 ```
 (username: `admin`, password: `admin`)
 
