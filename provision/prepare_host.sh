@@ -3,6 +3,9 @@
 AMBARI_HOSTNAME=$1
 AMBARI_HOSTNAME_FQDN=$2
 NUMBER_OF_CLUSTER_NODES=$3
+
+# clean the local YUM cache (ls -la /var/cache/yum/x86_64/6/)
+yum clean all
  
 # Install the packages required for all cluster and admin nodes 
 yum -y install nc expect ed ntp dmidecode pciutils
