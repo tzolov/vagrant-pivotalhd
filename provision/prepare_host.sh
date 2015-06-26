@@ -38,3 +38,11 @@ done
 # Setup password-less ssh
 cp /vagrant/id_dsa.pub /home/vagrant/.ssh/
 cat /home/vagrant/.ssh/id_dsa.pub >> /home/vagrant/.ssh/authorized_keys
+
+# Configure Prereqs
+/etc/init.d/iptables stop
+chkconfig iptables off
+echo "umask 022" >> /etc/profile
+echo "echo 'never' > /sys/kernel/mm/redhat_transparent_hugepage/defrag" >> /etc/rc.local
+echo "echo 'never' > /sys/kernel/mm/redhat_transparent_hugepage/enabled" >> /etc/rc.local
+source /etc/rc.local
