@@ -16,12 +16,12 @@ require 'json'
 # Set the Blueprint file name that defines the cluster to be deployed. 
 # File must exist under the /blueprints subfolder!
 # Sample HDP blueprint: BLUEPRINT_FILE_NAME = "hdp-hdfs-yarn-springxd-zk-blueprint.json"
-BLUEPRINT_FILE_NAME = "phd-all-services-blueprint.json"
+BLUEPRINT_FILE_NAME = "phd-hdfs-hawq-blueprint.json"
 
 # Set the Host-Mapping file name that maps the above Blueprint into physical nodes. 
 # File must exist under the /blueprints subfolder!
 # Sample HDP host mapping: HOST_MAPPING_FILE_NAME = "2-node-hdfs-yarn-springxd-zk-blueprint-hostmapping.json"
-HOST_MAPPING_FILE_NAME = "4-node-all-services-hostmapping.json"
+HOST_MAPPING_FILE_NAME = "2-node-hdfs-hawq-blueprint-hostmapping.json"
 
 # Set the name of the cluster to be deployed
 CLUSTER_NAME = "PHD30C1"
@@ -50,8 +50,8 @@ DEPLOY_BLUEPRINT_CLUSTER = TRUE
 ###############################################################################
 # Maps provisioning script to the supported stack
 INSTALL_AMBARI_STACK = {
-  "PHD" => "provision/phd_install_ambari.sh",
-  "HDP" => "provision/hdp_install_ambari.sh"
+  "PHD3.0" => "provision/phd_install_ambari.sh",
+  "HDP2.2" => "provision/hdp_install_ambari.sh"
 }
 
 # Create an Ambari FQDN hostname from the prefix and the localdomain domain. 
@@ -62,7 +62,7 @@ blueprint_spec = JSON.parse(open("blueprints/" + BLUEPRINT_FILE_NAME).read)
 BLUEPRINT_NAME = blueprint_spec["Blueprints"]["blueprint_name"]
 STACK_NAME = blueprint_spec['Blueprints']['stack_name']
 STACK_VERSION = blueprint_spec['Blueprints']['stack_version']
-AMBARI_PROVISION_SCRIPT = INSTALL_AMBARI_STACK[STACK_NAME]
+AMBARI_PROVISION_SCRIPT = INSTALL_AMBARI_STACK[STACK_NAME + STACK_VERSION]
 
 # Print deployment info
 print "CLUSTER NAME: #{CLUSTER_NAME} \nBLUEPRINT NAME: #{BLUEPRINT_NAME} \n"
