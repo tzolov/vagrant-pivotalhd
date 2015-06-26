@@ -1,5 +1,6 @@
 #!/bin/bash 
 
+# Install, configure and start Ambari Agent on every cluster host [phd1 ... phdN]
 for i in $(eval echo {1..$1}); do 
   su - -c "ssh -o StrictHostKeyChecking=no vagrant@phd$i.localdomain 'sudo ls;'" vagrant
   su - -c "scp /etc/yum.repos.d/ambari.repo vagrant@phd$i.localdomain:" vagrant
