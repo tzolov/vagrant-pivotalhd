@@ -45,4 +45,5 @@ sleep 15
 # Deploy the cluster
 curl --user admin:admin -H 'X-Requested-By:ambari' -X POST http://$AMBARI_HOSTNAME:8080/api/v1/clusters/$CLUSTER_NAME -d @$HOST_MAPPING_FILE
 
-echo "Open http://$AMBARI_HOSTNAME:8080 (user:admin, pass: admin) to monitor the installation progress"
+#echo "Open http://$AMBARI_HOSTNAME:8080 (user:admin, pass: admin) to monitor the installation progress"
+echo "Open http://10.211.55.100:8080 (user:admin, pass: admin) to monitor the installation progress"
