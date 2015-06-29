@@ -25,7 +25,7 @@ chmod -R a+rx /staging
 tar -xvzf /vagrant/packages/AMBARI-1.7.1-87-centos6.tar -C /staging/
 tar -xvzf /vagrant/packages/PHD-3.0.0.0-249-centos6.tar -C /staging/
 tar -xvzf /vagrant/packages/PHD-UTILS-1.1.0.20-centos6.tar -C /staging/
-tar -xvzf /vagrant/packages/PADS-1.3.0.2-14421-rhel5_x86_64.tar.gz -C /staging/
+tar -xvzf /vagrant/packages/PADS-1.3.0.3-14932-rhel5_x86_64.tar.gz -C /staging/
 tar -xvzf /vagrant/packages/hawq-plugin-phd-1.2-99.tar.gz -C /staging/
 
 # Setup internal YUM repositories for the installation packages
