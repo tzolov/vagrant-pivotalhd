@@ -16,12 +16,12 @@ require 'json'
 # Set the Blueprint file name that defines the cluster to be deployed. 
 # File must exist under the /blueprints subfolder!
 # Sample HDP blueprint: BLUEPRINT_FILE_NAME = "hdp-hdfs-yarn-springxd-zk-blueprint.json"
-BLUEPRINT_FILE_NAME = "phd-hdfs-hawq-blueprint.json"
+BLUEPRINT_FILE_NAME = "phd-all-services-blueprint.json"
 
 # Set the Host-Mapping file name that maps the above Blueprint into physical nodes. 
 # File must exist under the /blueprints subfolder!
 # Sample HDP host mapping: HOST_MAPPING_FILE_NAME = "2-node-hdfs-yarn-springxd-zk-blueprint-hostmapping.json"
-HOST_MAPPING_FILE_NAME = "2-node-hdfs-hawq-blueprint-hostmapping.json"
+HOST_MAPPING_FILE_NAME = "4-node-all-services-hostmapping.json"
 
 # Set the name of the cluster to be deployed
 CLUSTER_NAME = "PHD30C1"
