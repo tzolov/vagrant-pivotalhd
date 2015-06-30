@@ -6,6 +6,9 @@ NUMBER_OF_CLUSTER_NODES=$3
 
 # clean the local YUM cache (ls -la /var/cache/yum/x86_64/6/)
 yum clean all
+rm -Rf /var/cache/yum/x86_64/6/
+yum -y update all
+yum -y install mysql-connector-java
  
 # Install the packages required for all cluster and admin nodes 
 yum -y install nc expect ed ntp dmidecode pciutils
