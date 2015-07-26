@@ -51,7 +51,8 @@ DEPLOY_BLUEPRINT_CLUSTER = TRUE
 # Maps provisioning script to the supported stack
 INSTALL_AMBARI_STACK = {
   "PHD3.0" => "provision/phd_install_ambari.sh",
-  "HDP2.2" => "provision/hdp_install_ambari.sh"
+  "HDP2.2" => "provision/hdp_install_ambari.sh",
+  "HDP2.3" => "provision/hdp23_install_ambari.sh"
 }
 
 # Create an Ambari FQDN hostname from the prefix and the localdomain domain. 

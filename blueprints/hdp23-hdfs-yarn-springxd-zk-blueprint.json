@@ -1,0 +1,62 @@
+{
+  "Blueprints" : {
+    "stack_name" : "HDP",
+    "stack_version" : "2.3",
+    "blueprint_name": "hdp23-2-node-blueprint"
+  },
+  
+  "configurations" : [    
+    {
+      "nagios-env": {
+        "nagios_contact": "admin@localhost.com"
+      }
+    }
+  ],
+  
+  "host_groups" : [
+    {
+      "name" : "management_masters",
+      "configurations" : [ ],
+      "components" : [
+        {"name" : "AMBARI_SERVER"},
+		{"name" : "SECONDARY_NAMENODE"},        
+		
+        {"name" : "ZOOKEEPER_CLIENT" },
+        {"name" : "HDFS_CLIENT"},
+		{"name" : "YARN_CLIENT"},
+		{"name" : "MAPREDUCE2_CLIENT"},		
+		{"name" : "SPRINGXDSHELL"},
+        
+        {"name" : "METRICS_MONITOR"}        
+      ],
+      "cardinality" : "1"
+    },  
+    {
+      "name" : "masters_workers",
+      "configurations" : [ ],
+      "components" : [
+        {"name" : "NAMENODE" },
+		{"name" : "RESOURCEMANAGER"},
+		{"name" : "APP_TIMELINE_SERVER"},
+		{"name" : "HISTORYSERVER"},
+		{"name" : "SPRINGXDADMIN"},
+		{"name" : "SPRINGXDHSQL"},				
+		{"name" : "ZOOKEEPER_SERVER" },                
+		
+        {"name" : "DATANODE"},
+		{"name" : "NODEMANAGER"},
+		{"name" : "SPRINGXDCONTAINER"},
+						
+        {"name" : "ZOOKEEPER_CLIENT" },        
+        {"name" : "HDFS_CLIENT"},
+		{"name" : "MAPREDUCE2_CLIENT"},
+		{"name" : "YARN_CLIENT"},
+		{"name" : "SPRINGXDSHELL"},
+		
+        {"name" : "METRICS_COLLECTOR"},        
+        {"name" : "METRICS_MONITOR"}		
+      ],
+      "cardinality" : "1"
+    }
+  ]
+}

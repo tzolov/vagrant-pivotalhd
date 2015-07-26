@@ -1,0 +1,16 @@
+{ 
+  "blueprint" : "hdp23-2-node-blueprint",
+  "default_password" : "secret-password",
+  "host_groups" : [
+    { 
+      "name" : "management_masters",
+      "hosts": [ { "fqdn":"ambari.localdomain" }  ] 
+    },
+    { 
+      "name" : "masters_workers",
+      "hosts": [ { "fqdn":"phd1.localdomain" } ] 
+    } 
+  ] 
+}
+
+

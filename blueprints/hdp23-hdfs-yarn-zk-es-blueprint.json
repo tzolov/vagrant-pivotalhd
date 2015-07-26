@@ -1,0 +1,75 @@
+{
+  "Blueprints" : {
+    "stack_name" : "HDP",
+    "stack_version" : "2.3",
+    "blueprint_name": "hdp23-2-node-blueprint"
+  },
+  
+  "configurations" : [    
+    {
+      "nagios-env": {
+        "nagios_contact": "admin@localhost.com"
+      }
+	},  
+	{  
+		"elasticsearch-site": {
+
+	  		"es.hdfs.upload.dir": "/apps/elasticsearch/",
+	  	  	"es.yarn.container.count": "4",
+	  	  	"es.yarn.container.mem": "1024",
+	  	  	"download.local.dir": "./downloads/",
+	  	  	"es.jar.download.url": "https://oss.sonatype.org/content/repositories/snapshots/org/elasticsearch/elasticsearch-yarn/2.2.0.BUILD-SNAPSHOT/elasticsearch-yarn-2.2.0.BUILD-20150722.024358-29.jar",
+	  	  	"es.load.config": " env.ES_USE_GC_LOGGING=true env.PROP=someValue",
+	  	  	"es.jar.path": "/opt/es/elasticsearch-yarn.jar",
+	  	  	"es.user": "elastic",
+	  	  	"es.version": "1.7.0",
+	  	  	"es.group": "elastic",
+	  	  	"es.yarn.container.priority": "-1",
+	  	  	"es.yarn.container.vcores": "1"
+  	  }	  
+    }
+  ],
+  
+  "host_groups" : [
+    {
+      "name" : "management_masters",
+      "configurations" : [ ],
+      "components" : [
+        {"name" : "AMBARI_SERVER"},
+		{"name" : "SECONDARY_NAMENODE"},        
+		{"name" : "ELASTICSEARCH_YARN_MASTER"},        
+		
+        {"name" : "ZOOKEEPER_CLIENT" },
+        {"name" : "HDFS_CLIENT"},
+		{"name" : "YARN_CLIENT"},
+		{"name" : "MAPREDUCE2_CLIENT"},		
+        
+        {"name" : "METRICS_MONITOR"}        
+      ],
+      "cardinality" : "1"
+    },  
+    {
+      "name" : "masters_workers",
+      "configurations" : [ ],
+      "components" : [
+        {"name" : "NAMENODE" },
+		{"name" : "RESOURCEMANAGER"},
+		{"name" : "APP_TIMELINE_SERVER"},
+		{"name" : "HISTORYSERVER"},
+		{"name" : "ZOOKEEPER_SERVER" },                
+		
+        {"name" : "DATANODE"},
+		{"name" : "NODEMANAGER"},
+						
+        {"name" : "ZOOKEEPER_CLIENT" },        
+        {"name" : "HDFS_CLIENT"},
+		{"name" : "MAPREDUCE2_CLIENT"},
+		{"name" : "YARN_CLIENT"},
+		
+        {"name" : "METRICS_COLLECTOR"},        
+        {"name" : "METRICS_MONITOR"}		
+      ],
+      "cardinality" : "1"
+    }
+  ]
+}
