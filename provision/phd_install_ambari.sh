@@ -8,10 +8,10 @@ chmod 400 /home/vagrant/.ssh/id_dsa
 cat /vagrant/id_dsa.pub | cat >> ~/.ssh/authorized_keys
 
 # Install EPEL repository. Required by the pip (SetRepo.py) and SpringXD
-rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm      
+rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
  
 # Install HTTPD service needed for the local YUM repo
-yum -y install httpd wget python-pip
+yum -y install httpd wget python-pip git
 service httpd start
 
 # Required by the python scripts.
@@ -22,11 +22,11 @@ mkdir /staging
 chmod -R a+rx /staging 
 
 # Uncompress the tarballs into the staging area
-tar -xvzf /vagrant/packages/AMBARI-1.7.1-87-centos6.tar -C /staging/
-tar -xvzf /vagrant/packages/PHD-3.0.0.0-249-centos6.tar -C /staging/
+tar -xvzf /vagrant/packages/AMBARI-1.7.1-88-centos6.tar.gz -C /staging/
+tar -xvzf /vagrant/packages/PHD-3.0.1.0-1-centos6.tar.gz -C /staging/
 tar -xvzf /vagrant/packages/PHD-UTILS-1.1.0.20-centos6.tar -C /staging/
-tar -xvzf /vagrant/packages/PADS-1.3.0.3-14932-rhel5_x86_64.tar.gz -C /staging/
-tar -xvzf /vagrant/packages/hawq-plugin-phd-1.2-99.tar.gz -C /staging/
+tar -xvzf /vagrant/packages/PADS-1.3.1.0-15874-rhel5_x86_64.tar -C /staging/
+tar -xvzf /vagrant/packages/hawq-plugin-phd-1.3.0-152.tar -C /staging/
 
 # Setup internal YUM repositories for the installation packages
 for f in /staging/**/setup_repo.sh
@@ -45,7 +45,7 @@ cp /vagrant/packages/jdk-7u67-linux-x64.tar.gz /var/lib/ambari-server/resources/
 cp /vagrant/packages/UnlimitedJCEPolicyJDK7.zip /var/lib/ambari-server/resources/
 
 # Install Ambari Plugins
-yum -y install /staging/hawq-plugin-phd-1.2-99/hawq-plugin-1.2-99.noarch.rpm
+yum -y install /staging/hawq-plugin-phd-1.3.0/hawq-plugin-1.3.0-152.noarch.rpm
 yum -y install spring-xd-plugin-phd
 
 # Set nagios credentials nagiosadmin/admin

@@ -1,7 +1,7 @@
 # Packages
 This folder keeps the packages and tarballs to be installed. For legal reasons we can not distribute those packages directly but you can follow the instructions bellow to collect them. 
 
-Supported stacks (`PHD3.0` and `HDP2.2`) have common pakcages (like JDK7 and UnlimitedJCEPolicyJDK7) and specific tarballs. Follow the sections below to download the packages for the rquired stack. It is safe to download packages for both stacks it the same `packages` folder. 
+Supported stacks (`PHD3.0`, `HDP2.2` and `HDP2.3`) have common pakcages (like JDK7 and UnlimitedJCEPolicyJDK7) and specific tarballs. Follow the sections below to download the packages for the rquired stack. It is safe to download packages for both stacks it the same `packages` folder. 
 
 #### Packages common for all blueprint stacks
 
@@ -20,36 +20,41 @@ wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2F
 Nothing to do. The [SpringXD](http://projects.spring.io/spring-xd/) external YUM repository is installed authomatically according to [Installing Spring XD using Ambari](https://github.com/spring-projects/spring-xd-ambari/blob/master/src/docs/asciidoc/InstallingXDwithAmbari.asciidoc).
 
 #### PHD 3.0 Stack Packages
-
-###### Ambari-1.7 and PivotalHD-3.0
-From https://network.pivotal.io/products/pivotal-hd#/releases/3-0 download the Ambary and PHD3.0 tarballs:
+Latest version is `PHD-3.0.1`
+###### Ambari-1.7 and PivotalHD-3.0.1
+From https://network.pivotal.io/products/pivotal-hd#/releases/473 download the Ambary and PHD3.0.1 tarballs:
 * Pivotal Ambari 1.7.1 (RHEL, CentOS)
-* Pivotal HD 3.0 (RHEL, CentOS)
+* Pivotal HD 3.0.1 (RHEL, CentOS)
 * PHD Utils 1.1.0.20 (RHEL, CentOS)
 
-###### HAWQ 1.3
-From https://network.pivotal.io/products/pivotal-hawq#/releases/272/file_groups/279 download the fallowing HAWQ tarballs:
-* Pivotal HAWQ Ambari Plugin 1.2 - PHD 3.0
-* Pivotal HAWQ 1.3.0.3 (RHEL, CentOS) (r14932)
+###### HAWQ 1.3.1
+From https://network.pivotal.io/products/pivotal-hawq#/releases/476/file_groups/301 download the fallowing HAWQ tarballs:
+* Pivotal HAWQ Ambari Plugin 1.3 - PHD 3.0.1
+* Pivotal HAWQ 1.3.1.0 (RHEL) (r15874)
 
 Finally the packages folder should those tarballs:
 * jdk-7u67-linux-x64.tar.gz
 * UnlimitedJCEPolicyJDK7.zip
-* AMBARI-1.7.1-87-centos6.tar
-* PHD-3.0.0.0-249-centos6.tar
+* AMBARI-1.7.1-88-centos6.tar.gz
+* PHD-3.0.1.0-1-centos6.tar.gz
 * PHD-UTILS-1.1.0.20-centos6.tar
-* PADS-1.3.0.3-14932-rhel5_x86_64.tar.gz
-* hawq-plugin-phd-1.2-99.tar.gz
+* PADS-1.3.1.0-15874-rhel5_x86_64.tar
+* hawq-plugin-phd-1.3.0-152.tar
 
 #### HDP 2.2 Stack Packages
-###### HAWQ 1.3
-From https://network.pivotal.io/products/pivotal-hawq#/releases/272/file_groups/279 download the fallowing HAWQ tarballs:
-* Pivotal HAWQ Ambari Plugin 1.2 - HDP 2.2.4.2
-* Pivotal HAWQ 1.3.0.3 (RHEL, CentOS) (r14932)
+###### HAWQ 1.3.1
+From https://network.pivotal.io/products/pivotal-hawq#/releases/476/file_groups/301 download the fallowing HAWQ tarballs:
+* Pivotal HAWQ Ambari Plugin 1.3 - HDP 2.2.6
+* Pivotal HAWQ 1.3.1.0 (RHEL) (r15874)
  
 You packages folder should contain those tarballs:
 * jdk-7u67-linux-x64.tar.gz
 * UnlimitedJCEPolicyJDK7.zip
-* PADS-1.3.0.3-14932-rhel5_x86_64.tar.gz
-* hawq-plugin-hdp-1.2-133.tar.gz
+* PADS-1.3.1.0-15874-rhel5_x86_64.tar
+* hawq-plugin-hdp-1.3.0-190.tar
+
+#### HDP 2.3 Stack Packages
+
+TOOD
+
 

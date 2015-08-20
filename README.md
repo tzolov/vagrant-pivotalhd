@@ -60,12 +60,12 @@ For instructions how to create a custom `Blueprint` or `Host-Mapping` read the [
 		<tr>
 			<td><sub>CLUSTER_NAME</sub></td>
 			<td><sub>Sets the cluster name as it will appear in Ambari</sub></td>
-			<td><sub>PHD30C1</sub></td>
+			<td><sub>CLUSTER1</sub></td>
 		</tr>
 		<tr>
 			<td><sub>VM_BOX</sub></td>
 			<td><sub>Vagrant box name to use. Tested options are: <br/>- bigdata/centos6.4_x86_64 - 40G disk, <br/>- bigdata/centos6.4_x86_64_small - just 8G of disk space and <br/>- chef/centos-6.6 - CentOS6.6 box.</sub></td>
-			<td><sub>bigdata/centos6.4_x86_64</sub></td>
+			<td><sub>chef/centos-6.6</sub></td>
 		</tr>
 		<tr>
 			<td><sub>AMBARI_NODE_VM_MEMORY_MB</sub></td>

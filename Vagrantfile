@@ -24,13 +24,13 @@ BLUEPRINT_FILE_NAME = "phd-all-services-blueprint.json"
 HOST_MAPPING_FILE_NAME = "4-node-all-services-hostmapping.json"
 
 # Set the name of the cluster to be deployed
-CLUSTER_NAME = "PHD30C1"
+CLUSTER_NAME = "CLUSTER1"
 
 # Specify the Vagrant box name to use. Tested options are:
 # - bigdata/centos6.4_x86_64 - 40G disk space.
 # - bigdata/centos6.4_x86_64_small - just 8G of disk space. 
 # - chef/centos-6.6 - CentOS6.6 Vagrant box
-VM_BOX = "bigdata/centos6.4_x86_64"
+VM_BOX = "chef/centos-6.6"
 
 # Set the memory (MB) allocated for the AMBARI VM
 AMBARI_NODE_VM_MEMORY_MB = "768"
@@ -140,7 +140,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Provision Ambari VM. Install Ambari Server and deploy a PHD cluster
   AMBARI_VM_NAME = AMBARI_HOSTNAME_PREFIX
   
-  config.vm.define AMBARI_VM_NAME do |ambari|   
+  config.vm.define AMBARI_VM_NAME do |ambari|
    
    ambari.vm.box = VM_BOX
 
@@ -184,13 +184,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    ambari.vm.provision :shell, :inline => "hostname " + AMBARI_HOSTNAME_FQDN
 
    # Deploy Hadoop Cluster & Services as defined in the Blueprint/Host-Mapping files
-   if (DEPLOY_BLUEPRINT_CLUSTER)      
+   if (DEPLOY_BLUEPRINT_CLUSTER)
      ambari.vm.provision "shell" do |s|
        s.path = "provision/deploy_cluster.sh"
-       s.args = [AMBARI_HOSTNAME_FQDN, CLUSTER_NAME, BLUEPRINT_NAME, 
+       s.args = [AMBARI_HOSTNAME_FQDN, CLUSTER_NAME, BLUEPRINT_NAME,
                  "/vagrant/blueprints/" + BLUEPRINT_FILE_NAME, 
                  "/vagrant/blueprints/" + HOST_MAPPING_FILE_NAME]
-     end    
+     end
    end
   end
 end

@@ -1,0 +1,57 @@
+{
+  "Blueprints" : {
+    "stack_name" : "HDP",
+    "stack_version" : "2.2",
+    "blueprint_name": "hdfs-hawq-blueprint"
+  },
+  
+  "configurations" : [
+    {
+      "hawq-site" : {
+        "hawq.cluster.name" : "HAWQ",
+        "hawq.master.port" : "5532",
+        "sysctl.vm.overcommit_memory" : "1"
+      }
+    },
+    {
+      "hdfs-site" : {
+        "dfs.allow.truncate" : "true"
+      }
+    }
+  ],
+  
+  "host_groups" : [
+    {
+      "name" : "management_smasters",
+      "configurations" : [ ],
+      "components" : [
+        {"name" : "AMBARI_SERVER"},
+        {"name" : "HDFS_CLIENT"},
+        {"name" : "SECONDARY_NAMENODE"},
+        {"name" : "HAWQSTANDBY"},
+
+        {"name" : "METRICS_MONITOR"},
+        {"name" : "ZOOKEEPER_CLIENT" }
+      ],
+      "cardinality" : "1"
+    },  
+    {
+      "name" : "masters_workers",
+      "configurations" : [ ],
+      "components" : [
+        {"name" : "NAMENODE" },
+        {"name" : "HDFS_CLIENT"},
+        {"name" : "DATANODE"},
+        {"name" : "HAWQMASTER"},
+        {"name" : "PXF"},
+        {"name" : "HAWQSEGMENT"},
+        {"name" : "ZOOKEEPER_SERVER" }, 
+
+        {"name" : "ZOOKEEPER_CLIENT" },
+        {"name" : "METRICS_COLLECTOR"},
+        {"name" : "METRICS_MONITOR"}
+      ],
+      "cardinality" : "1"
+    }
+  ]
+}
