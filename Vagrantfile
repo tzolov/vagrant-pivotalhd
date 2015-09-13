@@ -29,8 +29,8 @@ CLUSTER_NAME = "CLUSTER1"
 # Specify the Vagrant box name to use. Tested options are:
 # - bigdata/centos6.4_x86_64 - 40G disk space.
 # - bigdata/centos6.4_x86_64_small - just 8G of disk space. 
-# - chef/centos-6.6 - CentOS6.6 Vagrant box
-VM_BOX = "chef/centos-6.6"
+# - bento/centos-6.7 - CentOS6.7 Vagrant box
+VM_BOX = "bento/centos-6.7"
 
 # Set the memory (MB) allocated for the AMBARI VM
 AMBARI_NODE_VM_MEMORY_MB = "768"
