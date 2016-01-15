@@ -24,9 +24,11 @@ def getRepos():
     for repo in repos:
         url = str(repo["href"])
         repoID = str(repo["Repositories"]["repo_id"])
-        if repoID.startswith("PHD") or  repoID.startswith("PADS"):
+        if repoID.startswith("PHD") or repoID.startswith("PADS"):
             if repoID == "PHD-3.0":
                 repoID = "PHD-3.0.1.0"
+            if repoID == "PHD-3.3":
+                repoID = "PHD-3.3.2.0"
             print url
             payload = "{\"Repositories\": {\"base_url\": \"http://" + hostName + "/" + repoID + "/\" , \"verify_base_url\" :false}}"
             print payload

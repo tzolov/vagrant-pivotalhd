@@ -16,12 +16,13 @@ require 'json'
 # Set the Blueprint file name that defines the cluster to be deployed. 
 # File must exist under the /blueprints subfolder!
 # Sample HDP blueprint: BLUEPRINT_FILE_NAME = "hdp-hdfs-yarn-springxd-zk-blueprint.json"
-BLUEPRINT_FILE_NAME = "phd-all-services-blueprint.json"
+# BLUEPRINT_FILE_NAME = "phd33-hdfs-hawq-blueprint.json"
+BLUEPRINT_FILE_NAME = "blueprint.test.json"
 
 # Set the Host-Mapping file name that maps the above Blueprint into physical nodes. 
 # File must exist under the /blueprints subfolder!
 # Sample HDP host mapping: HOST_MAPPING_FILE_NAME = "2-node-hdfs-yarn-springxd-zk-blueprint-hostmapping.json"
-HOST_MAPPING_FILE_NAME = "4-node-all-services-hostmapping.json"
+HOST_MAPPING_FILE_NAME = "2-node-test-hostmapping.json"
 
 # Set the name of the cluster to be deployed
 CLUSTER_NAME = "CLUSTER1"
@@ -33,7 +34,7 @@ CLUSTER_NAME = "CLUSTER1"
 VM_BOX = "bento/centos-6.7"
 
 # Set the memory (MB) allocated for the AMBARI VM
-AMBARI_NODE_VM_MEMORY_MB = "768"
+AMBARI_NODE_VM_MEMORY_MB = "3064"
 
 # Set the memory (MB) allocated for every PHD node VM
 PHD_NODE_VM_MEMORY_MB = "2048"
@@ -51,8 +52,9 @@ DEPLOY_BLUEPRINT_CLUSTER = TRUE
 ###############################################################################
 # Maps provisioning script to the supported stack
 INSTALL_AMBARI_STACK = {
-  "PHD3.0" => "provision/phd_install_ambari.sh",
-  "HDP2.2" => "provision/hdp_install_ambari.sh",
+  "PHD3.0" => "provision/phd30_install_ambari.sh",
+  "PHD3.3" => "provision/phd33_install_ambari.sh",
+  "HDP2.2" => "provision/hdp22_install_ambari.sh",
   "HDP2.3" => "provision/hdp23_install_ambari.sh"
 }
 
