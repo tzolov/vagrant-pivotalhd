@@ -49,7 +49,11 @@ yum -y install ambari-server
 # Install Ambari Plugins
 #yum -y install /staging/hawq-plugin-phd-1.3.0/hawq-plugin-1.3.0-152.noarch.rpm
 yum -y install hawq-plugin
-# yum -y install spring-xd-plugin-phd
+
+yum -y install spring-xd-plugin-phd33
+yum -y install geode-ambari-plugin-phd33
+yum -y install zeppelin-ambari-plugin-phd33
+yum -y install ambari-webpage-embedder-view
 
 # Set nagios credentials nagiosadmin/admin
 htpasswd -c -b  /etc/nagios/htpasswd.users nagiosadmin admin

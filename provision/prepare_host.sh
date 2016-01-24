@@ -49,3 +49,10 @@ echo "umask 022" >> /etc/profile
 echo "echo 'never' > /sys/kernel/mm/redhat_transparent_hugepage/defrag" >> /etc/rc.local
 echo "echo 'never' > /sys/kernel/mm/redhat_transparent_hugepage/enabled" >> /etc/rc.local
 source /etc/rc.local
+
+# Install Bintray YUM Repo
+wget https://bintray.com/big-data/rpm/rpm -O /etc/yum.repos.d/bintray-big-data-rpm.repo
+# Install SpringXD YUM Repo
+wget -nv http://repo.spring.io/yum-release/spring-xd/1.3/spring-xd-1.3.repo -O /etc/yum.repos.d/spring-xd-1.3.repo
+
+yum clean metadata
