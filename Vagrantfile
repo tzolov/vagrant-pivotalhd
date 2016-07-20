@@ -16,15 +16,15 @@ require 'json'
 # Set the Blueprint file name that defines the cluster to be deployed. 
 # File must exist under the /blueprints subfolder!
 # Sample HDP blueprint: BLUEPRINT_FILE_NAME = "hdp-hdfs-yarn-springxd-zk-blueprint.json"
-BLUEPRINT_FILE_NAME = "phd-all-services-blueprint.json"
+BLUEPRINT_FILE_NAME = "credco.json"
 
 # Set the Host-Mapping file name that maps the above Blueprint into physical nodes. 
 # File must exist under the /blueprints subfolder!
 # Sample HDP host mapping: HOST_MAPPING_FILE_NAME = "2-node-hdfs-yarn-springxd-zk-blueprint-hostmapping.json"
-HOST_MAPPING_FILE_NAME = "4-node-all-services-hostmapping.json"
+HOST_MAPPING_FILE_NAME = "5-node-all-services-hostmapping.json"
 
 # Set the name of the cluster to be deployed
-CLUSTER_NAME = "CLUSTER1"
+CLUSTER_NAME = "CDP"
 
 # Specify the Vagrant box name to use. Tested options are:
 # - bigdata/centos6.4_x86_64 - 40G disk space.
@@ -36,7 +36,7 @@ VM_BOX = "bento/centos-6.7"
 AMBARI_NODE_VM_MEMORY_MB = "768"
 
 # Set the memory (MB) allocated for every PHD node VM
-PHD_NODE_VM_MEMORY_MB = "2048"
+PHD_NODE_VM_MEMORY_MB = "1536"
 
 # Set the Ambari host name prefix. The suffix is fixed to '.localdomain'.
 # Note: THE FQDN NAME SHOULD NOT be in the phd[1-N].localdomain range.
@@ -53,7 +53,8 @@ DEPLOY_BLUEPRINT_CLUSTER = TRUE
 INSTALL_AMBARI_STACK = {
   "PHD3.0" => "provision/phd_install_ambari.sh",
   "HDP2.2" => "provision/hdp_install_ambari.sh",
-  "HDP2.3" => "provision/hdp23_install_ambari.sh"
+  "HDP2.3" => "provision/hdp23_install_ambari.sh",
+  "HDP2.4" => "provision/hdp24_install_ambari.sh"
 }
 
 # Create an Ambari FQDN hostname from the prefix and the localdomain domain. 
@@ -170,9 +171,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
    end 
 
    # Install Redis (Used as Spring XD transport)
-   ambari.vm.provision "shell" do |s|
-     s.path = "provision/install_redis.sh"
-   end 
+   #ambari.vm.provision "shell" do |s|
+   #  s.path = "provision/install_redis.sh"
+   #end 
 
    # Register the Ambari Agents and all nodes
    ambari.vm.provision "shell" do |s|
